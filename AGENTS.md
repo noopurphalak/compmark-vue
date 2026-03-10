@@ -1,6 +1,6 @@
 Keep AGENTS.md updated with project status
 
-# vuemark
+# compmark-vue
 
 Auto-generate Markdown documentation from Vue 3 SFCs.
 
@@ -26,7 +26,7 @@ src/
 - Parse `defineProps` (runtime syntax: shorthand, array type, full object)
 - Parse `defineEmits` (array syntax)
 - Extract JSDoc comments for props and emits
-- Output `.md` file via CLI: `vuemark <path-to-component.vue>`
+- Output `.md` file via CLI: `compmark-vue <path-to-component.vue>`
 - Handles `const props = defineProps(...)` variable assignment pattern
 - Default value stringification (literals, arrow functions)
 

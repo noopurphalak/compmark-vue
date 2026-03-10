@@ -1,4 +1,4 @@
-# vuemark
+# compmark-vue
 
 <!-- automd:badges color=yellow -->
 
@@ -44,7 +44,7 @@ const props = defineProps({
 </script>
 ```
 
-vuemark generates:
+compmark-vue generates:
 
 ```md
 # Dialog
@@ -110,4 +110,4 @@ const md = generateMarkdown(doc);
 
 ## License
 
-Published under the [MIT](https://github.com/noopurphalak/vuemark/blob/main/LICENSE) license.
+Published under the [MIT](https://github.com/noopurphalak/compmark-vue/blob/main/LICENSE) license.
