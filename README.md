@@ -2,8 +2,8 @@
 
 <!-- automd:badges color=yellow -->
 
-[![npm version](https://img.shields.io/npm/v/vuemark?color=yellow)](https://npmjs.com/package/vuemark)
-[![npm downloads](https://img.shields.io/npm/dm/vuemark?color=yellow)](https://npm.chart.dev/vuemark)
+[![npm version](https://img.shields.io/npm/v/compmark-vue?color=yellow)](https://npmjs.com/package/compmark-vue)
+[![npm downloads](https://img.shields.io/npm/dm/compmark-vue?color=yellow)](https://npm.chart.dev/compmark-vue)
 
 <!-- /automd -->
 
