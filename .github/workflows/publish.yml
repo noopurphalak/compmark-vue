@@ -2,14 +2,11 @@ name: publish
 on:
   workflow_dispatch:
     inputs:
-      tag:
-        description: "npm dist-tag"
+      dry-run:
+        description: "Dry run (skip actual publish)"
         required: false
-        default: "latest"
-        type: choice
-        options:
-          - latest
-          - next
+        default: false
+        type: boolean
 jobs:
   publish:
     runs-on: ubuntu-latest
@@ -27,6 +24,12 @@ jobs:
       - run: pnpm install
       - run: pnpm test
       - run: pnpm build
-      - run: npm publish --provenance --tag ${{ inputs.tag }}
+      - name: Read version from package.json
+        id: version
+        run: echo "tag=$(node -p "require('./package.json').version")" >> "$GITHUB_OUTPUT"
+      - name: Publish to npm
+        if: ${{ !inputs.dry-run }}
+        run: npm publish --provenance --tag ${{ steps.version.outputs.tag }}
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - run: echo "Published vuemark@${{ steps.version.outputs.tag }}"
