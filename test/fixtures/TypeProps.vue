@@ -1,7 +1,7 @@
 <script setup lang="ts">
 defineProps<{
   /** The visual theme */
-  theme?: 'filled' | 'outline';
+  theme?: "filled" | "outline";
   /** HTML button type */
   type?: string;
   /** Whether the button is disabled */

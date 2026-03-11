@@ -1,5 +1,10 @@
 import { parse, compileScript } from "@vue/compiler-sfc";
-import type { Statement, Expression, ObjectProperty, TSTypeParameterInstantiation } from "@babel/types";
+import type {
+  Statement,
+  Expression,
+  ObjectProperty,
+  TSTypeParameterInstantiation,
+} from "@babel/types";
 import type { ComponentDoc, PropDoc, EmitDoc } from "./types.ts";
 
 export function parseSFC(source: string, filename: string): ComponentDoc {
@@ -31,10 +36,7 @@ export function parseSFC(source: string, filename: string): ComponentDoc {
     for (const { callee, args, leadingComments, typeParams, defaultsArg } of calls) {
       if (callee === "defineProps" && args[0]?.type === "ObjectExpression") {
         doc.props = extractProps(args[0], scriptSource);
-      } else if (
-        callee === "defineProps" &&
-        typeParams?.params[0]?.type === "TSTypeLiteral"
-      ) {
+      } else if (callee === "defineProps" && typeParams?.params[0]?.type === "TSTypeLiteral") {
         doc.props = extractTypeProps(typeParams.params[0], defaultsArg, scriptSource);
       } else if (callee === "defineEmits" && args[0]?.type === "ArrayExpression") {
         doc.emits = extractEmits(args[0], leadingComments);
@@ -90,14 +92,14 @@ function extractDefineCalls(stmt: Statement): DefineCall[] {
   if (
     stmt.type === "ExpressionStatement" &&
     stmt.expression.type === "CallExpression" &&
-    (stmt.expression.callee.type === "Identifier")
+    stmt.expression.callee.type === "Identifier"
   ) {
     calls.push(processCallExpression(stmt.expression, comments));
   }
 
   if (stmt.type === "VariableDeclaration") {
     for (const decl of stmt.declarations) {
-      if (decl.init?.type === "CallExpression" && (decl.init.callee.type === "Identifier")) {
+      if (decl.init?.type === "CallExpression" && decl.init.callee.type === "Identifier") {
         calls.push(processCallExpression(decl.init, comments));
       }
     }
@@ -111,9 +113,10 @@ function extractTypeProps(
   defaultsArg: Expression | undefined,
   source: string,
 ): PropDoc[] {
-  const defaults = defaultsArg?.type === "ObjectExpression"
-    ? extractDefaultsMap(defaultsArg, source)
-    : new Map<string, string>();
+  const defaults =
+    defaultsArg?.type === "ObjectExpression"
+      ? extractDefaultsMap(defaultsArg, source)
+      : new Map<string, string>();
 
   const props: PropDoc[] = [];
 
