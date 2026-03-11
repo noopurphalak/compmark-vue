@@ -287,17 +287,39 @@ describe("parseSFC", () => {
       expect(footer).toBeDefined();
     });
 
-    it("merges defineSlots with template slots (defineSlots takes priority)", () => {
+    it("defineSlots overrides template slots (pure fallback)", () => {
       const source = loadFixture("DefineSlots.vue");
       const doc = parseSFC(source, "DefineSlots.vue");
 
       // DefineSlots.vue has defineSlots with "default" and "header"
       // Template has just <slot /> (default)
-      // defineSlots should take priority, template default should not duplicate
-      const defaultSlots = doc.slots!.filter((s) => s.name === "default");
-      expect(defaultSlots).toHaveLength(1);
+      // defineSlots completely overrides template slots — pure fallback behavior
+      expect(doc.slots).toHaveLength(2);
+      const names = doc.slots!.map((s) => s.name);
+      expect(names).toContain("default");
+      expect(names).toContain("header");
       // The defineSlots version has typed bindings
-      expect(defaultSlots[0]!.bindings).toEqual(["msg: string"]);
+      const defaultSlot = doc.slots!.find((s) => s.name === "default")!;
+      expect(defaultSlot.bindings).toEqual(["msg: string"]);
+    });
+
+    it("extracts slots from template-only component (no script content)", () => {
+      const source = `<template>
+  <div>
+    <slot name="nav-panel" />
+    <slot name="content-panel" />
+    <slot name="survey-footer" />
+  </div>
+</template>
+
+<script setup></script>`;
+      const doc = parseSFC(source, "TemplateOnly.vue");
+
+      expect(doc.slots).toHaveLength(3);
+      const names = doc.slots!.map((s) => s.name);
+      expect(names).toContain("nav-panel");
+      expect(names).toContain("content-panel");
+      expect(names).toContain("survey-footer");
     });
   });
 

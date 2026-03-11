@@ -70,6 +70,14 @@ export function parseSFC(source: string, filename: string): ComponentDoc {
 
   const { descriptor } = parse(source, { filename });
 
+  // Extract template slots early (before early return) so template-only components get slots
+  if (descriptor.template?.ast) {
+    const templateSlots = extractTemplateSlots(descriptor.template.ast);
+    if (templateSlots.length > 0) {
+      doc.slots = templateSlots;
+    }
+  }
+
   if (!descriptor.scriptSetup && !descriptor.script) {
     return doc;
   }
@@ -115,12 +123,6 @@ export function parseSFC(source: string, filename: string): ComponentDoc {
     const optionsDoc = extractOptionsAPI(scriptAst, compiled.content);
     doc.props = optionsDoc.props;
     doc.emits = optionsDoc.emits;
-  }
-
-  // Template slot extraction
-  if (descriptor.template?.ast) {
-    const templateSlots = extractTemplateSlots(descriptor.template.ast);
-    doc.slots = mergeSlots(doc.slots ?? [], templateSlots);
   }
 
   return doc;
@@ -729,19 +731,6 @@ function walkTemplate(children: any[], slots: SlotDoc[]): void {
       }
     }
   }
-}
-
-function mergeSlots(typedSlots: SlotDoc[], templateSlots: SlotDoc[]): SlotDoc[] {
-  const merged = [...typedSlots];
-  const typedNames = new Set(typedSlots.map((s) => s.name));
-
-  for (const ts of templateSlots) {
-    if (!typedNames.has(ts.name)) {
-      merged.push(ts);
-    }
-  }
-
-  return merged;
 }
 
 // --- Options API ---
