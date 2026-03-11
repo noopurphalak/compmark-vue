@@ -21,6 +21,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      pull-requests: write
       id-token: write
     steps:
       - uses: actions/checkout@v6
@@ -53,24 +54,34 @@ jobs:
           "
           echo "version=${NEW_VERSION}" >> "$GITHUB_OUTPUT"
           echo "Bumped version: ${CURRENT} → ${NEW_VERSION}"
-      - name: Commit version bump
-        if: ${{ !inputs.dry-run }}
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add package.json
-          git commit -m "Bump version: ${{ steps.bump.outputs.version }}"
-          git tag "v${{ steps.bump.outputs.version }}"
-          git push --follow-tags
-      - name: Read version from package.json (dry run)
-        if: ${{ inputs.dry-run }}
-        id: pkg-dry
-        run: echo "version=$(node -p "require('./package.json').version")" >> "$GITHUB_OUTPUT"
       - name: Publish to npm
         if: ${{ !inputs.dry-run }}
         run: npm publish --provenance --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: Create version bump PR
+        if: ${{ !inputs.dry-run }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          VERSION="${{ steps.bump.outputs.version }}"
+          BRANCH="version-bump/${VERSION}"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$BRANCH"
+          git add package.json
+          git commit -m "Bump version: ${VERSION}"
+          git push origin "$BRANCH"
+          gh pr create \
+            --title "Bump version: ${VERSION}" \
+            --body "Automated version bump to \`${VERSION}\` after npm publish." \
+            --base main \
+            --head "$BRANCH"
+          gh pr merge "$BRANCH" --auto --squash
+      - name: Read version from package.json (dry run)
+        if: ${{ inputs.dry-run }}
+        id: pkg-dry
+        run: echo "version=$(node -p "require('./package.json').version")" >> "$GITHUB_OUTPUT"
       - name: Summary
         run: |
           if [ "${{ inputs.dry-run }}" = "true" ]; then
