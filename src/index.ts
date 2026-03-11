@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { parseSFC } from "./parser.ts";
 
-export type { ComponentDoc, PropDoc, EmitDoc } from "./types.ts";
+export type { ComponentDoc, PropDoc, EmitDoc, SlotDoc, ExposeDoc, ComposableDoc } from "./types.ts";
 export { parseSFC } from "./parser.ts";
 export { generateMarkdown } from "./markdown.ts";
 

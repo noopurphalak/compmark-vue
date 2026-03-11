@@ -5,7 +5,60 @@ import type {
   ObjectProperty,
   TSTypeParameterInstantiation,
 } from "@babel/types";
-import type { ComponentDoc, PropDoc, EmitDoc } from "./types.ts";
+import type { ComponentDoc, PropDoc, EmitDoc, SlotDoc, ExposeDoc, ComposableDoc } from "./types.ts";
+
+// --- JSDoc parsing ---
+
+interface JSDocResult {
+  description: string;
+  deprecated?: string | boolean;
+  since?: string;
+  example?: string;
+  see?: string;
+  defaultOverride?: string;
+  internal?: boolean;
+}
+
+function parseJSDocTags(comments: Array<{ type: string; value: string }>): JSDocResult {
+  const result: JSDocResult = { description: "" };
+  const descLines: string[] = [];
+
+  for (let i = comments.length - 1; i >= 0; i--) {
+    const c = comments[i]!;
+    if (c.type !== "CommentBlock") continue;
+
+    const lines = c.value
+      .split("\n")
+      .map((l) => l.replace(/^\s*\*\s?/, "").trim())
+      .filter((l) => l && !l.startsWith("/"));
+
+    for (const line of lines) {
+      if (line.startsWith("@deprecated")) {
+        const reason = line.replace(/^@deprecated\s*/, "").trim();
+        result.deprecated = reason || true;
+      } else if (line.startsWith("@since")) {
+        result.since = line.replace(/^@since\s*/, "").trim();
+      } else if (line.startsWith("@example")) {
+        result.example = line.replace(/^@example\s*/, "").trim();
+      } else if (line.startsWith("@see")) {
+        result.see = line.replace(/^@see\s*/, "").trim();
+      } else if (line.startsWith("@default")) {
+        result.defaultOverride = line.replace(/^@default\s*/, "").trim();
+      } else if (line.startsWith("@internal")) {
+        result.internal = true;
+      } else if (!line.startsWith("@")) {
+        descLines.push(line);
+      }
+    }
+
+    break; // only process last comment block
+  }
+
+  result.description = descLines.join(" ");
+  return result;
+}
+
+// --- Main entry ---
 
 export function parseSFC(source: string, filename: string): ComponentDoc {
   const name =
@@ -22,30 +75,85 @@ export function parseSFC(source: string, filename: string): ComponentDoc {
   }
 
   const compiled = compileScript(descriptor, { id: filename });
-  const ast = compiled.scriptSetupAst;
 
-  if (!ast) {
-    return doc;
-  }
+  // Component-level JSDoc
+  const componentJSDoc = extractComponentJSDoc(compiled.scriptSetupAst ?? compiled.scriptAst ?? []);
+  doc.description = componentJSDoc.description;
+  doc.internal = componentJSDoc.internal;
 
-  // AST node offsets map to the scriptSetup content, not compiled.content
-  const scriptSource = descriptor.scriptSetup?.content ?? compiled.content;
+  // Process <script setup>
+  const setupAst = compiled.scriptSetupAst;
+  if (setupAst) {
+    const scriptSource = descriptor.scriptSetup?.content ?? compiled.content;
 
-  for (const stmt of ast) {
-    const calls = extractDefineCalls(stmt);
-    for (const { callee, args, leadingComments, typeParams, defaultsArg } of calls) {
-      if (callee === "defineProps" && args[0]?.type === "ObjectExpression") {
-        doc.props = extractProps(args[0], scriptSource);
-      } else if (callee === "defineProps" && typeParams?.params[0]?.type === "TSTypeLiteral") {
-        doc.props = extractTypeProps(typeParams.params[0], defaultsArg, scriptSource);
-      } else if (callee === "defineEmits" && args[0]?.type === "ArrayExpression") {
-        doc.emits = extractEmits(args[0], leadingComments);
+    for (const stmt of setupAst) {
+      const calls = extractDefineCalls(stmt);
+      for (const { callee, args, leadingComments, typeParams, defaultsArg } of calls) {
+        if (callee === "defineProps" && args[0]?.type === "ObjectExpression") {
+          doc.props = extractProps(args[0], scriptSource);
+        } else if (callee === "defineProps" && typeParams?.params[0]?.type === "TSTypeLiteral") {
+          doc.props = extractTypeProps(typeParams.params[0], defaultsArg, scriptSource);
+        } else if (callee === "defineEmits" && args[0]?.type === "ArrayExpression") {
+          doc.emits = extractEmits(args[0], leadingComments);
+        } else if (callee === "defineEmits" && typeParams?.params[0]?.type === "TSTypeLiteral") {
+          doc.emits = extractTypeEmits(typeParams.params[0]);
+        } else if (callee === "defineSlots" && typeParams?.params[0]?.type === "TSTypeLiteral") {
+          doc.slots = extractTypeSlots(typeParams.params[0]);
+        } else if (callee === "defineExpose" && args[0]?.type === "ObjectExpression") {
+          doc.exposes = extractExposes(args[0], scriptSource);
+        }
       }
     }
+
+    // Composable detection
+    doc.composables = extractComposables(setupAst);
+  }
+
+  // Options API fallback
+  const scriptAst = compiled.scriptAst;
+  if (scriptAst && doc.props.length === 0 && doc.emits.length === 0) {
+    const optionsDoc = extractOptionsAPI(scriptAst, compiled.content);
+    doc.props = optionsDoc.props;
+    doc.emits = optionsDoc.emits;
+  }
+
+  // Template slot extraction
+  if (descriptor.template?.ast) {
+    const templateSlots = extractTemplateSlots(descriptor.template.ast);
+    doc.slots = mergeSlots(doc.slots ?? [], templateSlots);
   }
 
   return doc;
 }
+
+// --- Component-level JSDoc ---
+
+function extractComponentJSDoc(ast: Statement[]): { description: string; internal: boolean } {
+  if (ast.length === 0) return { description: "", internal: false };
+
+  const first = ast[0]!;
+  const comments = (first.leadingComments ?? []) as Array<{ type: string; value: string }>;
+
+  if (comments.length === 0) return { description: "", internal: false };
+
+  // Only consider the first comment block as component-level if it's not
+  // attached to a define call
+  const firstComment = comments[0]!;
+  if (firstComment.type !== "CommentBlock") return { description: "", internal: false };
+
+  // Check if this is a component-level comment (starts with @component or is before any define call)
+  const result = parseJSDocTags([firstComment]);
+
+  // Only treat as component-level if it has @internal or @component tag,
+  // or if the first statement is not a define call
+  if (result.internal) {
+    return { description: result.description, internal: true };
+  }
+
+  return { description: "", internal: false };
+}
+
+// --- Define call extraction ---
 
 interface DefineCall {
   callee: string;
@@ -108,6 +216,8 @@ function extractDefineCalls(stmt: Statement): DefineCall[] {
   return calls;
 }
 
+// --- Props extraction ---
+
 function extractTypeProps(
   typeLiteral: { members: Array<any> },
   defaultsArg: Expression | undefined,
@@ -135,7 +245,7 @@ function extractTypeProps(
       ? resolveTypeString(member.typeAnnotation.typeAnnotation)
       : "unknown";
 
-    const description = extractJSDoc(
+    const jsdoc = parseJSDocTags(
       (member.leadingComments ?? []) as Array<{ type: string; value: string }>,
     );
 
@@ -144,7 +254,11 @@ function extractTypeProps(
       type,
       required: !member.optional,
       default: defaults.get(name),
-      description,
+      description: jsdoc.description,
+      ...(jsdoc.deprecated !== undefined && { deprecated: jsdoc.deprecated }),
+      ...(jsdoc.since && { since: jsdoc.since }),
+      ...(jsdoc.example && { example: jsdoc.example }),
+      ...(jsdoc.see && { see: jsdoc.see }),
     });
   }
 
@@ -163,6 +277,12 @@ function resolveTypeString(node: any): string {
       return "object";
     case "TSAnyKeyword":
       return "any";
+    case "TSVoidKeyword":
+      return "void";
+    case "TSNullKeyword":
+      return "null";
+    case "TSUndefinedKeyword":
+      return "undefined";
     case "TSUnionType":
       return node.types.map((t: any) => resolveTypeString(t)).join(" | ");
     case "TSIntersectionType":
@@ -184,6 +304,12 @@ function resolveTypeString(node: any): string {
     }
     case "TSFunctionType":
       return "Function";
+    case "TSTupleType":
+      return `[${node.elementTypes.map((t: any) => resolveTypeString(t)).join(", ")}]`;
+    case "TSNamedTupleMember":
+      return resolveTypeString(node.elementType);
+    case "TSParenthesizedType":
+      return resolveTypeString(node.typeAnnotation);
     default:
       return "unknown";
   }
@@ -225,9 +351,16 @@ function extractProps(
 
     if (!name) continue;
 
-    const description = extractJSDoc(
+    const jsdoc = parseJSDocTags(
       (p.leadingComments ?? []) as Array<{ type: string; value: string }>,
     );
+
+    const tagFields = {
+      ...(jsdoc.deprecated !== undefined && { deprecated: jsdoc.deprecated }),
+      ...(jsdoc.since && { since: jsdoc.since }),
+      ...(jsdoc.example && { example: jsdoc.example }),
+      ...(jsdoc.see && { see: jsdoc.see }),
+    };
 
     if (p.value.type === "Identifier") {
       // Shorthand: { name: String }
@@ -236,7 +369,8 @@ function extractProps(
         type: p.value.name,
         required: false,
         default: undefined,
-        description,
+        description: jsdoc.description,
+        ...tagFields,
       });
     } else if (p.value.type === "ArrayExpression") {
       // Array type: { name: [String, Number] }
@@ -248,7 +382,8 @@ function extractProps(
         type: types.join(" | "),
         required: false,
         default: undefined,
-        description,
+        description: jsdoc.description,
+        ...tagFields,
       });
     } else if (p.value.type === "ObjectExpression") {
       // Full syntax: { name: { type: X, required: Y, default: Z } }
@@ -276,12 +411,21 @@ function extractProps(
         }
       }
 
-      props.push({ name, type, required, default: defaultVal, description });
+      props.push({
+        name,
+        type,
+        required,
+        default: defaultVal,
+        description: jsdoc.description,
+        ...tagFields,
+      });
     }
   }
 
   return props;
 }
+
+// --- Emits extraction ---
 
 function extractEmits(
   arr: Extract<Expression, { type: "ArrayExpression" }>,
@@ -326,22 +470,367 @@ function parseEmitJSDoc(comments: Array<{ type: string; value: string }>): Map<s
   return map;
 }
 
-function extractJSDoc(comments: Array<{ type: string; value: string }>): string {
-  for (let i = comments.length - 1; i >= 0; i--) {
-    const c = comments[i]!;
-    if (c.type !== "CommentBlock") continue;
+// --- TS Generic Emits ---
 
-    const lines = c.value
-      .split("\n")
-      .map((l) => l.replace(/^\s*\*\s?/, "").trim())
-      .filter((l) => l && !l.startsWith("@") && !l.startsWith("/"));
+function extractTypeEmits(typeLiteral: { members: Array<any> }): EmitDoc[] {
+  const emits: EmitDoc[] = [];
 
-    if (lines.length > 0) {
-      return lines.join(" ");
+  for (const member of typeLiteral.members) {
+    if (member.type === "TSPropertySignature") {
+      const name =
+        member.key.type === "Identifier"
+          ? member.key.name
+          : member.key.type === "StringLiteral"
+            ? member.key.value
+            : "";
+      if (!name) continue;
+
+      const jsdoc = parseJSDocTags(
+        (member.leadingComments ?? []) as Array<{ type: string; value: string }>,
+      );
+
+      let payload: string | undefined;
+      // typeAnnotation -> TSTupleType elements
+      const typeAnnotation = member.typeAnnotation?.typeAnnotation;
+      if (typeAnnotation?.type === "TSTupleType") {
+        payload = typeAnnotation.elementTypes
+          .map((el: any) => {
+            if (el.type === "TSNamedTupleMember") {
+              const label = el.label?.name ?? "arg";
+              return `${label}: ${resolveTypeString(el.elementType)}`;
+            }
+            return resolveTypeString(el);
+          })
+          .join(", ");
+      }
+
+      emits.push({
+        name,
+        description: jsdoc.description,
+        ...(payload && { payload }),
+      });
+    } else if (member.type === "TSCallSignatureDeclaration") {
+      // defineEmits<{ (e: 'click', payload: MouseEvent): void }>()
+      const params = member.parameters ?? [];
+      if (params.length === 0) continue;
+
+      // First param is the event name
+      const firstParam = params[0];
+      if (
+        firstParam?.typeAnnotation?.typeAnnotation?.type !== "TSLiteralType" ||
+        firstParam.typeAnnotation.typeAnnotation.literal.type !== "StringLiteral"
+      ) {
+        continue;
+      }
+
+      const name = firstParam.typeAnnotation.typeAnnotation.literal.value;
+
+      const jsdoc = parseJSDocTags(
+        (member.leadingComments ?? []) as Array<{ type: string; value: string }>,
+      );
+
+      // Remaining params are the payload
+      const payloadParams = params.slice(1);
+      let payload: string | undefined;
+      if (payloadParams.length > 0) {
+        payload = payloadParams
+          .map((p: any) => {
+            const paramName = p.type === "Identifier" ? p.name : "arg";
+            const paramType = p.typeAnnotation?.typeAnnotation
+              ? resolveTypeString(p.typeAnnotation.typeAnnotation)
+              : "unknown";
+            return `${paramName}: ${paramType}`;
+          })
+          .join(", ");
+      }
+
+      emits.push({
+        name,
+        description: jsdoc.description,
+        ...(payload && { payload }),
+      });
     }
   }
-  return "";
+
+  return emits;
 }
+
+// --- Slots extraction ---
+
+function extractTypeSlots(typeLiteral: { members: Array<any> }): SlotDoc[] {
+  const slots: SlotDoc[] = [];
+
+  for (const member of typeLiteral.members) {
+    // defineSlots uses TSMethodSignature or TSPropertySignature
+    const name =
+      member.key?.type === "Identifier"
+        ? member.key.name
+        : member.key?.type === "StringLiteral"
+          ? member.key.value
+          : "";
+    if (!name) continue;
+
+    const jsdoc = parseJSDocTags(
+      (member.leadingComments ?? []) as Array<{ type: string; value: string }>,
+    );
+
+    const bindings: string[] = [];
+
+    if (member.type === "TSMethodSignature" && member.parameters?.length > 0) {
+      // First parameter's type annotation contains the slot props
+      const firstParam = member.parameters[0];
+      const propsType = firstParam?.typeAnnotation?.typeAnnotation;
+      if (propsType?.type === "TSTypeLiteral") {
+        for (const prop of propsType.members) {
+          if (prop.type === "TSPropertySignature") {
+            const propName =
+              prop.key.type === "Identifier"
+                ? prop.key.name
+                : prop.key.type === "StringLiteral"
+                  ? prop.key.value
+                  : "";
+            const propType = prop.typeAnnotation?.typeAnnotation
+              ? resolveTypeString(prop.typeAnnotation.typeAnnotation)
+              : "unknown";
+            if (propName) {
+              bindings.push(`${propName}: ${propType}`);
+            }
+          }
+        }
+      }
+    }
+
+    slots.push({
+      name,
+      description: jsdoc.description,
+      bindings,
+    });
+  }
+
+  return slots;
+}
+
+// --- Expose extraction ---
+
+function extractExposes(
+  obj: Extract<Expression, { type: "ObjectExpression" }>,
+  _source: string,
+): ExposeDoc[] {
+  const exposes: ExposeDoc[] = [];
+
+  for (const prop of obj.properties) {
+    if (prop.type !== "ObjectProperty" && prop.type !== "ObjectMethod") continue;
+
+    const key = prop.key;
+    const name =
+      key.type === "Identifier" ? key.name : key.type === "StringLiteral" ? key.value : "";
+    if (!name) continue;
+
+    const jsdoc = parseJSDocTags(
+      (prop.leadingComments ?? []) as Array<{ type: string; value: string }>,
+    );
+
+    exposes.push({
+      name,
+      type: "unknown",
+      description: jsdoc.description,
+    });
+  }
+
+  return exposes;
+}
+
+// --- Composable detection ---
+
+function extractComposables(ast: Statement[]): ComposableDoc[] {
+  const seen = new Set<string>();
+  const composables: ComposableDoc[] = [];
+
+  for (const stmt of ast) {
+    const callNames = extractComposableCallNames(stmt);
+    for (const name of callNames) {
+      if (!seen.has(name)) {
+        seen.add(name);
+        composables.push({ name });
+      }
+    }
+  }
+
+  return composables;
+}
+
+function extractComposableCallNames(stmt: Statement): string[] {
+  const names: string[] = [];
+
+  if (
+    stmt.type === "ExpressionStatement" &&
+    stmt.expression.type === "CallExpression" &&
+    stmt.expression.callee.type === "Identifier" &&
+    /^use[A-Z]/.test(stmt.expression.callee.name)
+  ) {
+    names.push(stmt.expression.callee.name);
+  }
+
+  if (stmt.type === "VariableDeclaration") {
+    for (const decl of stmt.declarations) {
+      if (
+        decl.init?.type === "CallExpression" &&
+        decl.init.callee.type === "Identifier" &&
+        /^use[A-Z]/.test(decl.init.callee.name)
+      ) {
+        names.push(decl.init.callee.name);
+      }
+    }
+  }
+
+  return names;
+}
+
+// --- Template slot extraction ---
+
+function extractTemplateSlots(templateAst: any): SlotDoc[] {
+  const slots: SlotDoc[] = [];
+  walkTemplate(templateAst.children ?? [], slots);
+  return slots;
+}
+
+function walkTemplate(children: any[], slots: SlotDoc[]): void {
+  for (const node of children) {
+    // Element node with slot tag
+    // In Vue's compiler AST: type 1 = ELEMENT, tagType 2 = SLOT
+    if (node.type === 1 && node.tag === "slot") {
+      let name = "default";
+      const bindings: string[] = [];
+
+      for (const prop of node.props ?? []) {
+        // Static attribute: type 6 = ATTRIBUTE
+        if (prop.type === 6 && prop.name === "name" && prop.value?.content) {
+          name = prop.value.content;
+        }
+        // Directive: type 7 = DIRECTIVE
+        if (prop.type === 7 && prop.name === "bind" && prop.arg?.content) {
+          bindings.push(prop.arg.content);
+        }
+      }
+
+      slots.push({ name, description: "", bindings });
+    }
+
+    // Recurse into children
+    if (node.children) {
+      walkTemplate(node.children, slots);
+    }
+    // Also check branches (v-if/v-else)
+    if (node.branches) {
+      for (const branch of node.branches) {
+        if (branch.children) {
+          walkTemplate(branch.children, slots);
+        }
+      }
+    }
+  }
+}
+
+function mergeSlots(typedSlots: SlotDoc[], templateSlots: SlotDoc[]): SlotDoc[] {
+  const merged = [...typedSlots];
+  const typedNames = new Set(typedSlots.map((s) => s.name));
+
+  for (const ts of templateSlots) {
+    if (!typedNames.has(ts.name)) {
+      merged.push(ts);
+    }
+  }
+
+  return merged;
+}
+
+// --- Options API ---
+
+function extractOptionsAPI(
+  ast: Statement[],
+  source: string,
+): { props: PropDoc[]; emits: EmitDoc[] } {
+  let props: PropDoc[] = [];
+  let emits: EmitDoc[] = [];
+
+  for (const stmt of ast) {
+    if (stmt.type !== "ExportDefaultDeclaration") continue;
+    const decl = stmt.declaration;
+    if (decl.type !== "ObjectExpression") continue;
+
+    for (const prop of decl.properties) {
+      if (prop.type !== "ObjectProperty") continue;
+      const key = prop.key;
+      const name = key.type === "Identifier" ? key.name : "";
+
+      if (name === "props") {
+        if (prop.value.type === "ObjectExpression") {
+          props = extractProps(
+            prop.value as Extract<Expression, { type: "ObjectExpression" }>,
+            source,
+          );
+        } else if (prop.value.type === "ArrayExpression") {
+          props = extractArrayProps(prop.value as Extract<Expression, { type: "ArrayExpression" }>);
+        }
+      } else if (name === "emits") {
+        if (prop.value.type === "ArrayExpression") {
+          const comments = (stmt.leadingComments ?? []) as Array<{ type: string; value: string }>;
+          emits = extractEmits(
+            prop.value as Extract<Expression, { type: "ArrayExpression" }>,
+            comments,
+          );
+        } else if (prop.value.type === "ObjectExpression") {
+          emits = extractObjectEmits(
+            prop.value as Extract<Expression, { type: "ObjectExpression" }>,
+          );
+        }
+      }
+    }
+
+    break; // only process first export default
+  }
+
+  return { props, emits };
+}
+
+function extractArrayProps(arr: Extract<Expression, { type: "ArrayExpression" }>): PropDoc[] {
+  const props: PropDoc[] = [];
+  for (const el of arr.elements) {
+    if (el?.type === "StringLiteral") {
+      props.push({
+        name: el.value,
+        type: "unknown",
+        required: false,
+        default: undefined,
+        description: "",
+      });
+    }
+  }
+  return props;
+}
+
+function extractObjectEmits(obj: Extract<Expression, { type: "ObjectExpression" }>): EmitDoc[] {
+  const emits: EmitDoc[] = [];
+  for (const prop of obj.properties) {
+    if (prop.type !== "ObjectProperty") continue;
+    const name =
+      prop.key.type === "Identifier"
+        ? prop.key.name
+        : prop.key.type === "StringLiteral"
+          ? prop.key.value
+          : "";
+    if (!name) continue;
+
+    const jsdoc = parseJSDocTags(
+      (prop.leadingComments ?? []) as Array<{ type: string; value: string }>,
+    );
+
+    emits.push({ name, description: jsdoc.description });
+  }
+  return emits;
+}
+
+// --- Utilities ---
 
 function stringifyDefault(node: Expression, source: string): string {
   switch (node.type) {

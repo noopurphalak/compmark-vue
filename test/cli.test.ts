@@ -52,7 +52,7 @@ describe("CLI", () => {
   it("exits 1 with usage on missing argument", () => {
     const { stderr, status } = tryRun("");
     expect(status).not.toBe(0);
-    expect(stderr).toContain("Usage: compmark-vue <path-to-component.vue>");
+    expect(stderr).toContain("Usage: compmark <path-to-component.vue>");
   });
 
   it("exits 1 on non-.vue file", () => {
@@ -77,5 +77,62 @@ describe("CLI", () => {
 
     const content = readFileSync(outFile, "utf-8");
     expect(content).toContain("# FullComponent");
+  });
+
+  // --- Phase 2 CLI tests ---
+
+  it("skips @internal components with message", () => {
+    const outDir = import.meta.dirname!;
+    const outFile = join(outDir, "InternalComponent.md");
+    cleanupFiles.push(outFile);
+
+    const { stdout, status } = tryRun(`${join(fixturesDir, "InternalComponent.vue")}`, outDir);
+    expect(status).toBe(0);
+    expect(stdout).toContain("Skipped");
+    expect(stdout).toContain("@internal");
+    expect(existsSync(outFile)).toBe(false);
+  });
+
+  it("generates markdown with slots section", () => {
+    const outDir = import.meta.dirname!;
+    const outFile = join(outDir, "TemplateSlots.md");
+    cleanupFiles.push(outFile);
+
+    tryRun(`${join(fixturesDir, "TemplateSlots.vue")}`, outDir);
+    expect(existsSync(outFile)).toBe(true);
+
+    const content = readFileSync(outFile, "utf-8");
+    expect(content).toContain("## Slots");
+    expect(content).toContain("header");
+  });
+
+  it("generates markdown with all sections for complete component", () => {
+    const outDir = import.meta.dirname!;
+    const outFile = join(outDir, "CompleteComponent.md");
+    cleanupFiles.push(outFile);
+
+    tryRun(`${join(fixturesDir, "CompleteComponent.vue")}`, outDir);
+    expect(existsSync(outFile)).toBe(true);
+
+    const content = readFileSync(outFile, "utf-8");
+    expect(content).toContain("## Props");
+    expect(content).toContain("## Emits");
+    expect(content).toContain("## Slots");
+    expect(content).toContain("## Exposed");
+    expect(content).toContain("## Composables Used");
+  });
+
+  it("generates markdown for Options API component", () => {
+    const outDir = import.meta.dirname!;
+    const outFile = join(outDir, "OptionsApi.md");
+    cleanupFiles.push(outFile);
+
+    tryRun(`${join(fixturesDir, "OptionsApi.vue")}`, outDir);
+    expect(existsSync(outFile)).toBe(true);
+
+    const content = readFileSync(outFile, "utf-8");
+    expect(content).toContain("## Props");
+    expect(content).toContain("## Emits");
+    expect(content).toContain("| title |");
   });
 });
