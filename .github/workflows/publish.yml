@@ -54,12 +54,7 @@ jobs:
           "
           echo "version=${NEW_VERSION}" >> "$GITHUB_OUTPUT"
           echo "Bumped version: ${CURRENT} → ${NEW_VERSION}"
-      - name: Publish to npm
-        if: ${{ !inputs.dry-run }}
-        run: npm publish --provenance --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-      - name: Create version bump PR
+      - name: Merge version bump to main
         if: ${{ !inputs.dry-run }}
         env:
           GH_TOKEN: ${{ github.token }}
@@ -78,6 +73,14 @@ jobs:
             --base main \
             --head "$BRANCH"
           gh pr merge "$BRANCH" --squash --admin
+      - name: Rebuild with bumped version
+        if: ${{ !inputs.dry-run }}
+        run: pnpm build
+      - name: Publish to npm
+        if: ${{ !inputs.dry-run }}
+        run: npm publish --provenance --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
       - name: Read version from package.json (dry run)
         if: ${{ inputs.dry-run }}
         id: pkg-dry
