@@ -5,7 +5,7 @@
   "license": "MIT",
   "repository": "noopurphalak/compmark-vue",
   "bin": {
-    "compmark-vue": "./dist/cli.mjs"
+    "compmark": "./dist/cli.mjs"
   },
   "files": [
     "dist"
@@ -45,11 +45,11 @@
     "typescript": "latest",
     "vitest": "latest"
   },
-  "packageManager": "pnpm@10.29.3",
   "lint-staged": {
     "*.{ts,vue}": [
       "oxlint --fix",
       "oxfmt"
     ]
-  }
+  },
+  "packageManager": "pnpm@10.29.3"
 }

@@ -8,7 +8,7 @@ import { generateMarkdown } from "./markdown.ts";
 const filePath = process.argv[2];
 
 if (!filePath) {
-  console.error("Usage: compmark-vue <path-to-component.vue>");
+  console.error("Usage: compmark <path-to-component.vue>");
   process.exit(1);
 }
 
@@ -26,6 +26,13 @@ if (!existsSync(abs)) {
 
 try {
   const doc = parseComponent(abs);
+
+  if (doc.internal) {
+    const name = abs.split("/").pop() ?? filePath;
+    console.log(`Skipped ${name} (marked @internal)`);
+    process.exit(0);
+  }
+
   const md = generateMarkdown(doc);
   const outFile = `${doc.name}.md`;
   const outPath = join(process.cwd(), outFile);

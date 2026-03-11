@@ -6,19 +6,19 @@ Auto-generate Markdown documentation from Vue 3 SFCs.
 
 ## Status
 
-- **Version:** 0.1.0 (Phase 1 complete)
-- **Tests:** 28 passing (parser: 17, markdown: 6, CLI: 5)
-- **Coverage:** 88% statements, 92% lines
+- **Version:** 0.2.0 (Phase 2 complete)
+- **Tests:** 62 passing (parser: 37, markdown: 16, CLI: 9)
+- **Coverage:** 88% statements, 93% lines
 
 ## Architecture
 
 ```
 src/
-  types.ts      — PropDoc, EmitDoc, ComponentDoc interfaces
+  types.ts      — PropDoc, EmitDoc, SlotDoc, ExposeDoc, ComposableDoc, ComponentDoc interfaces
   parser.ts     — SFC parsing + AST extraction (core logic)
-  markdown.ts   — Markdown table generation
+  markdown.ts   — Markdown table generation (props, emits, slots, exposed, composables)
   index.ts      — Public library API (re-exports + parseComponent)
-  cli.ts        — CLI entry point (argv, file I/O, error messages)
+  cli.ts        — CLI entry point (argv, file I/O, @internal skip)
 ```
 
 ## Phase 1 (v0.1.0) — Complete
@@ -32,9 +32,24 @@ src/
 - TypeScript generic `defineProps<T>()` with inline type literals
 - `withDefaults(defineProps<T>(), {...})` support
 
+## Phase 2 (v0.2.0) — Complete
+
+- CLI renamed: `compmark-vue` → `compmark`
+- TS generic `defineEmits<{...}>()` (property signature + call signature syntax)
+- `defineSlots<{...}>()` with typed bindings
+- Template `<slot>` extraction with merge logic (defineSlots takes priority)
+- `defineExpose({...})` with JSDoc descriptions
+- Composable detection (`use*` pattern)
+- Enhanced JSDoc tags: `@deprecated`, `@since`, `@example`, `@see`, `@internal`
+- Component-level `@internal` tag → CLI skips with message
+- Options API support (`export default { props, emits }`)
+- Options API array props and object emits (validation syntax)
+- Markdown output: Slots, Exposed, Composables sections; Payload column for emits; @deprecated/@since/@example/@see annotations
+
 ## Not yet implemented
 
 - `defineProps<Props>()` with imported/external interfaces (requires cross-file type resolution)
+- `defineModel` (Vue 3.4+)
 - Glob/folder support
 - Watch mode
 - Config file
