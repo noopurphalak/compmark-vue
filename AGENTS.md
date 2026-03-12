@@ -6,8 +6,8 @@ Auto-generate Markdown documentation from Vue 3 SFCs.
 
 ## Status
 
-- **Version:** 0.2.0 (Phase 2 complete)
-- **Tests:** 62 passing (parser: 37, markdown: 16, CLI: 9)
+- **Version:** 0.2.5
+- **Tests:** 64 passing (parser: 38, markdown: 17, CLI: 9)
 - **Coverage:** 88% statements, 93% lines
 
 ## Architecture
@@ -37,7 +37,7 @@ src/
 - CLI renamed: `compmark-vue` → `compmark`
 - TS generic `defineEmits<{...}>()` (property signature + call signature syntax)
 - `defineSlots<{...}>()` with typed bindings
-- Template `<slot>` extraction with merge logic (defineSlots takes priority)
+- Template `<slot>` extraction as fallback (`defineSlots` fully overrides when present)
 - `defineExpose({...})` with JSDoc descriptions
 - Composable detection (`use*` pattern)
 - Enhanced JSDoc tags: `@deprecated`, `@since`, `@example`, `@see`, `@internal`
@@ -45,6 +45,14 @@ src/
 - Options API support (`export default { props, emits }`)
 - Options API array props and object emits (validation syntax)
 - Markdown output: Slots, Exposed, Composables sections; Payload column for emits; @deprecated/@since/@example/@see annotations
+
+## v0.2.1–0.2.5 — Bugfixes & docs
+
+- Fix template slot extraction for template-only components (no script content)
+- `defineSlots` now fully overrides template slots (pure fallback, no merge)
+- Escape pipe (`|`) characters in Markdown table cells (fixes broken tables for union types)
+- Comprehensive README rewrite with examples for all features
+- CLI test timeout increase for stability
 
 ## Not yet implemented
 
