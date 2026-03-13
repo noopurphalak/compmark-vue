@@ -5,14 +5,14 @@
   "keywords": [
     "compmark",
     "compmark-vue",
-    "vue",
-    "vue3",
     "component",
-    "markdown",
-    "documentation",
-    "sfc",
     "docs-generator",
-    "vue-documentation"
+    "documentation",
+    "markdown",
+    "sfc",
+    "vue",
+    "vue-documentation",
+    "vue3"
   ],
   "license": "MIT",
   "repository": "noopurphalak/compmark-vue",
