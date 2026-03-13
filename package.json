@@ -2,6 +2,18 @@
   "name": "compmark-vue",
   "version": "0.3.2",
   "description": "Auto-generate Markdown documentation from Vue 3 SFCs",
+  "keywords": [
+    "compmark",
+    "compmark-vue",
+    "vue",
+    "vue3",
+    "component",
+    "markdown",
+    "documentation",
+    "sfc",
+    "docs-generator",
+    "vue-documentation"
+  ],
   "license": "MIT",
   "repository": "noopurphalak/compmark-vue",
   "bin": {
