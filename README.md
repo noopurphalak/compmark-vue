@@ -9,6 +9,20 @@
 
 Auto-generate Markdown documentation from Vue 3 SFCs. Zero configuration required.
 
+## Quick Start
+
+Document a single component:
+
+```sh
+npx compmark-vue ./src/components/Button.vue
+```
+
+Document an entire directory:
+
+```sh
+npx compmark-vue ./src/components --out ./docs/api
+```
+
 ## Installation
 
 ```sh
@@ -24,21 +38,7 @@ yarn add -D compmark-vue
 
 > Requires Node.js >= 20
 
-## Quick Start
-
-Document a single component:
-
-```sh
-npx compmark-vue ./src/components/Button.vue
-```
-
-Document an entire directory:
-
-```sh
-npx compmark-vue ./src/components --out ./docs/api
-```
-
-Add to your `package.json`:
+## Add to your `package.json` post installation
 
 ```json
 {
