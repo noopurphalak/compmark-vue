@@ -54,15 +54,15 @@ yarn add -D compmark-vue
 compmark <files/dirs/globs> [options]
 ```
 
-| Option                  | Description                              | Default |
-| ----------------------- | ---------------------------------------- | ------- |
-| `--out <dir>`           | Output directory                         | `.`     |
-| `--format <md\|json>`   | Output format                            | `md`    |
-| `--join`                | Combine into a single file               |         |
-| `--ignore <patterns>`   | Comma-separated ignore patterns          |         |
-| `--preserve-structure`  | Mirror input folder tree in output       |         |
-| `--watch`               | Watch for changes and rebuild            |         |
-| `--silent`              | Suppress non-error output                |         |
+| Option                 | Description                        | Default |
+| ---------------------- | ---------------------------------- | ------- |
+| `--out <dir>`          | Output directory                   | `.`     |
+| `--format <md\|json>`  | Output format                      | `md`    |
+| `--join`               | Combine into a single file         |         |
+| `--ignore <patterns>`  | Comma-separated ignore patterns    |         |
+| `--preserve-structure` | Mirror input folder tree in output |         |
+| `--watch`              | Watch for changes and rebuild      |         |
+| `--silent`             | Suppress non-error output          |         |
 
 ### Examples
 
@@ -183,32 +183,33 @@ A dialog for confirming destructive user actions such as deletions.
 
 ## Refs
 
-| Name | Type | Description |
-| --- | --- | --- |
-| loading | Ref&lt;boolean&gt; | - |
+| Name    | Type               | Description |
+| ------- | ------------------ | ----------- |
+| loading | Ref&lt;boolean&gt; | -           |
 
 ## Props
 
-| Name | Type | Required | Default | Description |
-| --- | --- | --- | --- | --- |
-| open | boolean | Yes | - | Whether the dialog is visible |
-| title | string | No | - | Dialog title |
+| Name  | Type    | Required | Default | Description                   |
+| ----- | ------- | -------- | ------- | ----------------------------- |
+| open  | boolean | Yes      | -       | Whether the dialog is visible |
+| title | string  | No       | -       | Dialog title                  |
 
 ## Emits
 
-| Name | Description |
-| --- | --- |
+| Name    | Description                               |
+| ------- | ----------------------------------------- |
 | confirm | Emitted when the user confirms the action |
-| cancel | Emitted when the user cancels |
+| cancel  | Emitted when the user cancels             |
 
 ## Slots
 
-| Name | Bindings | Description |
-| --- | --- | --- |
-| default | - | - |
+| Name    | Bindings | Description |
+| ------- | -------- | ----------- |
+| default | -        | -           |
 ```
 
 The description is picked up automatically when the JSDoc comment is on:
+
 - An `import` statement (most common — put the comment at the top of the script)
 - A `defineProps` / `defineEmits` call (bare or `const props = defineProps(...)`)
 - A `withDefaults(...)` call
@@ -254,12 +255,12 @@ Output:
 ```md
 ## Refs
 
-| Name  | Type                  | Description        |
-| ----- | --------------------- | ------------------ |
-| count | Ref&lt;number&gt;     | The counter value *(since 1.0.0)* |
-| name  | Ref&lt;string&gt;     | The user's name    |
+| Name  | Type                       | Description                               |
+| ----- | -------------------------- | ----------------------------------------- |
+| count | Ref&lt;number&gt;          | The counter value _(since 1.0.0)_         |
+| name  | Ref&lt;string&gt;          | The user's name                           |
 | data  | ShallowRef&lt;string[]&gt; | - **Deprecated**: Use shallowData instead |
-| state | Object                | -                  |
+| state | Object                     | -                                         |
 ```
 
 Type inference priority:
@@ -296,11 +297,11 @@ Output:
 ```md
 ## Computed
 
-| Name     | Type                     | Description                       |
-| -------- | ------------------------ | --------------------------------- |
-| fullName | ComputedRef              | The full display name *(since 2.0.0)* |
-| total    | ComputedRef&lt;number&gt; | -                                |
-| doubled  | ComputedRef&lt;number&gt; | -                                |
+| Name     | Type                      | Description                           |
+| -------- | ------------------------- | ------------------------------------- |
+| fullName | ComputedRef               | The full display name _(since 2.0.0)_ |
+| total    | ComputedRef&lt;number&gt; | -                                     |
+| doubled  | ComputedRef&lt;number&gt; | -                                     |
 ```
 
 ### Props
@@ -633,9 +634,9 @@ Output:
 
 ## Computed
 
-| Name     | Type    | Description                            |
-| -------- | ------- | -------------------------------------- |
-| fullName | unknown | The full display name *(since 1.0.0)*  |
+| Name     | Type    | Description                           |
+| -------- | ------- | ------------------------------------- |
+| fullName | unknown | The full display name _(since 1.0.0)_ |
 
 ## Props
 
@@ -729,10 +730,7 @@ Multi-file processing:
 ```ts
 import { discoverFiles, processFiles } from "compmark-vue";
 
-const { files, ignoredCount, basePath } = await discoverFiles(
-  ["src/components"],
-  ["dist"],
-);
+const { files, ignoredCount, basePath } = await discoverFiles(["src/components"], ["dist"]);
 const summary = processFiles(files, { silent: false });
 // summary.files, summary.documented, summary.skipped, summary.errors
 ```
