@@ -54,14 +54,15 @@ yarn add -D compmark-vue
 compmark <files/dirs/globs> [options]
 ```
 
-| Option                | Description                     | Default |
-| --------------------- | ------------------------------- | ------- |
-| `--out <dir>`         | Output directory                | `.`     |
-| `--format <md\|json>` | Output format                   | `md`    |
-| `--join`              | Combine into a single file      |         |
-| `--ignore <patterns>` | Comma-separated ignore patterns |         |
-| `--watch`             | Watch for changes and rebuild   |         |
-| `--silent`            | Suppress non-error output       |         |
+| Option                  | Description                              | Default |
+| ----------------------- | ---------------------------------------- | ------- |
+| `--out <dir>`           | Output directory                         | `.`     |
+| `--format <md\|json>`   | Output format                            | `md`    |
+| `--join`                | Combine into a single file               |         |
+| `--ignore <patterns>`   | Comma-separated ignore patterns          |         |
+| `--preserve-structure`  | Mirror input folder tree in output       |         |
+| `--watch`               | Watch for changes and rebuild            |         |
+| `--silent`              | Suppress non-error output                |         |
 
 ### Examples
 
@@ -90,6 +91,11 @@ compmark src/components --format json --join --out docs
 # Ignore patterns
 compmark src/components --ignore "internal,*.test"
 
+# Preserve folder structure in output
+compmark src --out docs --preserve-structure
+# src/components/Button.vue → docs/components/Button.md
+# src/views/Home.vue       → docs/views/Home.md
+
 # Watch mode
 compmark src/components --out docs --watch
 
@@ -103,10 +109,17 @@ The summary line shows what happened:
 ✓ 24 components documented, 2 skipped, 0 errors
 ```
 
+Skipped count includes both `@internal` components and files matching `--ignore` patterns.
+
 Exit code is `1` when errors occur (except in watch mode).
+
+In watch mode, individual file changes are processed incrementally — only the changed file is re-parsed and re-written. If a file is deleted or becomes `@internal`, its output is automatically removed.
 
 ## Features
 
+- [Component description](#component-description) — JSDoc on the first statement becomes a component summary
+- [Refs](#refs) — `ref()`, `shallowRef()`, `reactive()`, `shallowReactive()` with type inference
+- [Computed](#computed) — `computed()` with generic and return-type inference
 - [Props](#props) — runtime and TypeScript generic syntax, including imported types
 - [Emits](#emits) — array, TypeScript property, and call signature syntax
 - [Slots](#slots) — `defineSlots` with typed bindings, template `<slot>` fallback
@@ -114,11 +127,181 @@ Exit code is `1` when errors occur (except in watch mode).
 - [Composables](#composables) — auto-detects `useX()` calls in `<script setup>`
 - [JSDoc tags](#jsdoc-tags) — `@deprecated`, `@since`, `@example`, `@see`, `@default`
 - [`@internal`](#internal-components) — exclude components from output
-- [Options API](#options-api) — `export default { props, emits }` support
+- [Options API](#options-api) — `export default { props, emits, data(), computed }` support
 - [Output formats](#output-formats) — Markdown (individual or joined), JSON
+- [Preserve structure](#preserve-structure) — mirror input folder tree in `--out`
 - Empty sections are skipped cleanly — no placeholder noise
 
 ## Examples
+
+### Component Description
+
+A JSDoc comment at the top of `<script setup>` is extracted as the component description and included in the generated `.md` file:
+
+```vue
+<!-- ConfirmDialog.vue -->
+<template>
+  <dialog :open="open">
+    <slot />
+    <button @click="$emit('confirm')">OK</button>
+    <button @click="$emit('cancel')">Cancel</button>
+  </dialog>
+</template>
+
+<script setup lang="ts">
+/**
+ * A dialog for confirming destructive user actions such as deletions.
+ */
+import { ref } from "vue";
+
+const props = defineProps<{
+  /** Whether the dialog is visible */
+  open: boolean;
+  /** Dialog title */
+  title?: string;
+}>();
+
+const emit = defineEmits<{
+  /** Emitted when the user confirms the action */
+  confirm: [];
+  /** Emitted when the user cancels */
+  cancel: [];
+}>();
+
+const loading = ref(false);
+</script>
+```
+
+Running `compmark ConfirmDialog.vue` produces `ConfirmDialog.md`:
+
+```md
+# ConfirmDialog
+
+A dialog for confirming destructive user actions such as deletions.
+
+**Note:** Uses `<script setup>` syntax.
+
+## Refs
+
+| Name | Type | Description |
+| --- | --- | --- |
+| loading | Ref&lt;boolean&gt; | - |
+
+## Props
+
+| Name | Type | Required | Default | Description |
+| --- | --- | --- | --- | --- |
+| open | boolean | Yes | - | Whether the dialog is visible |
+| title | string | No | - | Dialog title |
+
+## Emits
+
+| Name | Description |
+| --- | --- |
+| confirm | Emitted when the user confirms the action |
+| cancel | Emitted when the user cancels |
+
+## Slots
+
+| Name | Bindings | Description |
+| --- | --- | --- |
+| default | - | - |
+```
+
+The description is picked up automatically when the JSDoc comment is on:
+- An `import` statement (most common — put the comment at the top of the script)
+- A `defineProps` / `defineEmits` call (bare or `const props = defineProps(...)`)
+- A `withDefaults(...)` call
+
+If the first statement is a plain variable (like `const count = ref(0)`), use the `@component` tag so the comment isn't mistaken for a variable description:
+
+```vue
+<script setup lang="ts">
+/**
+ * @component
+ * A tooltip that appears on hover.
+ */
+const visible = ref(false);
+</script>
+```
+
+### Refs
+
+`ref()`, `shallowRef()`, `reactive()`, and `shallowReactive()` in `<script setup>` are automatically documented with inferred types:
+
+```vue
+<script setup lang="ts">
+import { ref, shallowRef, reactive, computed } from "vue";
+
+/**
+ * The counter value
+ * @since 1.0.0
+ */
+const count = ref(0);
+
+/** The user's name */
+const name = ref<string>("");
+
+/** @deprecated Use shallowData instead */
+const data = shallowRef<string[]>([]);
+
+const state = reactive({ count: 0, name: "" });
+</script>
+```
+
+Output:
+
+```md
+## Refs
+
+| Name  | Type                  | Description        |
+| ----- | --------------------- | ------------------ |
+| count | Ref&lt;number&gt;     | The counter value *(since 1.0.0)* |
+| name  | Ref&lt;string&gt;     | The user's name    |
+| data  | ShallowRef&lt;string[]&gt; | - **Deprecated**: Use shallowData instead |
+| state | Object                | -                  |
+```
+
+Type inference priority:
+
+1. Explicit TS annotation: `const x: Ref<string[]> = ref([])` → `Ref<string[]>`
+2. Generic type parameter: `ref<string>("")` → `Ref<string>`
+3. Literal argument: `ref(0)` → `Ref<number>`, `ref("")` → `Ref<string>`, `ref(true)` → `Ref<boolean>`
+4. Fallback: `Ref` (no type parameter)
+
+### Computed
+
+`computed()` calls are documented with type inference from generics or getter return types:
+
+```vue
+<script setup lang="ts">
+import { ref, computed } from "vue";
+
+const count = ref(0);
+
+/**
+ * The full display name
+ * @since 2.0.0
+ */
+const fullName = computed(() => "John Smith");
+
+const total = computed<number>(() => count.value * 2);
+
+const doubled = computed((): number => count.value * 2);
+</script>
+```
+
+Output:
+
+```md
+## Computed
+
+| Name     | Type                     | Description                       |
+| -------- | ------------------------ | --------------------------------- |
+| fullName | ComputedRef              | The full display name *(since 2.0.0)* |
+| total    | ComputedRef&lt;number&gt; | -                                |
+| doubled  | ComputedRef&lt;number&gt; | -                                |
+```
 
 ### Props
 
@@ -401,7 +584,7 @@ $ compmark InternalHelper.vue
 
 ### Options API
 
-Components using `export default {}` are supported:
+Components using `export default {}` are supported. Props, emits, `data()`, and `computed` are all extracted:
 
 ```vue
 <script>
@@ -418,6 +601,22 @@ export default {
     },
   },
   emits: ["click", "update"],
+  data() {
+    return {
+      /** The greeting message */
+      message: "Hello",
+      isActive: true,
+    };
+  },
+  computed: {
+    /**
+     * The full display name
+     * @since 1.0.0
+     */
+    fullName() {
+      return this.title + " Smith";
+    },
+  },
 };
 </script>
 ```
@@ -425,6 +624,19 @@ export default {
 Output:
 
 ```md
+## Refs
+
+| Name     | Type    | Description          |
+| -------- | ------- | -------------------- |
+| message  | string  | The greeting message |
+| isActive | boolean | -                    |
+
+## Computed
+
+| Name     | Type    | Description                            |
+| -------- | ------- | -------------------------------------- |
+| fullName | unknown | The full display name *(since 1.0.0)*  |
+
 ## Props
 
 | Name  | Type   | Required | Default | Description    |
@@ -439,6 +651,8 @@ Output:
 | click  | -           |
 | update | -           |
 ```
+
+`data()` return properties are documented as refs with literal type inference. Computed properties support both simple getters and get/set object syntax.
 
 ### Output Formats
 
@@ -470,6 +684,24 @@ compmark src/components --format json --join --out docs
 # Creates: docs/components.json with { generated, components: [...] }
 ```
 
+### Preserve Structure
+
+By default, all output files are placed flat in the `--out` directory. Use `--preserve-structure` to mirror the input folder hierarchy:
+
+```sh
+compmark src --out docs/api --preserve-structure
+```
+
+```
+src/components/Button.vue  → docs/api/components/Button.md
+src/components/Dialog.vue  → docs/api/components/Dialog.md
+src/views/Home.vue         → docs/api/views/Home.md
+```
+
+Without `--preserve-structure`, components with the same name in different directories get a numeric suffix (`Button.md`, `Button-2.md`). With `--preserve-structure`, they live in separate subdirectories.
+
+`--join` mode ignores `--preserve-structure` (single output file).
+
 ## Programmatic API
 
 ```sh
@@ -497,7 +729,10 @@ Multi-file processing:
 ```ts
 import { discoverFiles, processFiles } from "compmark-vue";
 
-const files = await discoverFiles(["src/components"], ["dist"]);
+const { files, ignoredCount, basePath } = await discoverFiles(
+  ["src/components"],
+  ["dist"],
+);
 const summary = processFiles(files, { silent: false });
 // summary.files, summary.documented, summary.skipped, summary.errors
 ```
