@@ -2,7 +2,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { resolve, dirname, join } from "node:path";
 import { loadConfig } from "c12";
 import { defu } from "defu";
-import type { CompmarkConfig } from "./types.ts";
+import type { CompmarkConfig, SectionKey } from "./types.ts";
 import { DEFAULT_SECTION_ORDER } from "./types.ts";
 
 const DEFAULT_CONFIG: CompmarkConfig = {
@@ -60,7 +60,7 @@ export function mergeWithCLIFlags(
   // defu concatenates arrays; replace array fields explicitly when CLI provided them
   if (overrides.exclude !== undefined) merged.exclude = overrides.exclude as string[];
   if (overrides.sectionOrder !== undefined)
-    merged.sectionOrder = overrides.sectionOrder as string[];
+    merged.sectionOrder = overrides.sectionOrder as SectionKey[];
   return merged;
 }
 
