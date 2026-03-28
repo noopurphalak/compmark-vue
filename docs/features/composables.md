@@ -6,11 +6,11 @@ compmark detects `use*()` pattern calls and documents their variable bindings wi
 
 ```vue
 <script setup lang="ts">
-import { useMouse } from '@vueuse/core'
-import { useAuth } from '@/composables/useAuth'
+import { useMouse } from "@vueuse/core";
+import { useAuth } from "@/composables/useAuth";
 
-const { x, y } = useMouse()
-const { user, isLoggedIn, logout } = useAuth()
+const { x, y } = useMouse();
+const { user, isLoggedIn, logout } = useAuth();
 </script>
 ```
 
@@ -24,7 +24,7 @@ const { user, isLoggedIn, logout } = useAuth()
 
 ### `useAuth`
 
-*Source: `@/composables/useAuth`*
+_Source: `@/composables/useAuth`_
 
 **Returns:** `user`, `isLoggedIn`, `logout`
 
@@ -34,20 +34,22 @@ When the composable source is a local import, compmark follows the import and in
 
 ```ts
 // src/composables/useCounter.ts
-import { ref, computed } from 'vue'
+import { ref, computed } from "vue";
 
 export function useCounter(initial = 0) {
-  const count = ref(initial)
-  const doubled = computed(() => count.value * 2)
-  function increment() { count.value++ }
-  return { count, doubled, increment }
+  const count = ref(initial);
+  const doubled = computed(() => count.value * 2);
+  function increment() {
+    count.value++;
+  }
+  return { count, doubled, increment };
 }
 ```
 
 ```vue
 <script setup lang="ts">
-import { useCounter } from '@/composables/useCounter'
-const { count, doubled, increment } = useCounter()
+import { useCounter } from "@/composables/useCounter";
+const { count, doubled, increment } = useCounter();
 </script>
 ```
 
@@ -55,13 +57,13 @@ const { count, doubled, increment } = useCounter()
 
 ### `useCounter`
 
-*Source: `@/composables/useCounter`*
+_Source: `@/composables/useCounter`_
 
-| Variable | Type |
-| --- | --- |
-| count | Ref&lt;number&gt; |
-| doubled | ComputedRef&lt;number&gt; |
-| increment | Function |
+| Variable  | Type                      |
+| --------- | ------------------------- |
+| count     | Ref&lt;number&gt;         |
+| doubled   | ComputedRef&lt;number&gt; |
+| increment | Function                  |
 
 ## Variable binding patterns
 
@@ -70,19 +72,19 @@ compmark supports all common destructuring patterns:
 ```vue
 <script setup>
 // Destructured object
-const { data, error } = useFetch('/api')
+const { data, error } = useFetch("/api");
 
 // Simple assignment
-const router = useRouter()
+const router = useRouter();
 
 // Array pattern
-const [value, setValue] = useState(0)
+const [value, setValue] = useState(0);
 
 // Rest element
-const { primary, ...rest } = useTheme()
+const { primary, ...rest } = useTheme();
 
 // Bare call (no return captured)
-useHead({ title: 'Home' })
+useHead({ title: "Home" });
 </script>
 ```
 

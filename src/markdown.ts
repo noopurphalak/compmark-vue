@@ -228,14 +228,22 @@ function hasAnySections(doc: ComponentDoc, sectionOrder?: SectionKey[]): boolean
   const keys = sectionOrder ?? DEFAULT_SECTION_ORDER;
   return keys.some((key) => {
     switch (key) {
-      case "props": return doc.props.length > 0;
-      case "emits": return doc.emits.length > 0;
-      case "slots": return (doc.slots?.length ?? 0) > 0;
-      case "exposed": return (doc.exposes?.length ?? 0) > 0;
-      case "composables": return (doc.composables?.length ?? 0) > 0;
-      case "refs": return (doc.refs?.length ?? 0) > 0;
-      case "computed": return (doc.computeds?.length ?? 0) > 0;
-      default: return false;
+      case "props":
+        return doc.props.length > 0;
+      case "emits":
+        return doc.emits.length > 0;
+      case "slots":
+        return (doc.slots?.length ?? 0) > 0;
+      case "exposed":
+        return (doc.exposes?.length ?? 0) > 0;
+      case "composables":
+        return (doc.composables?.length ?? 0) > 0;
+      case "refs":
+        return (doc.refs?.length ?? 0) > 0;
+      case "computed":
+        return (doc.computeds?.length ?? 0) > 0;
+      default:
+        return false;
     }
   });
 }

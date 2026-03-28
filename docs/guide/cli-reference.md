@@ -10,18 +10,18 @@ If `paths` are omitted, compmark uses the `include` patterns from your config fi
 
 ## Options
 
-| Flag | Type | Default | Description |
-| --- | --- | --- | --- |
-| `--out <DIR>` | string | `.` | Output directory |
-| `--ignore <PATTERNS>` | string | - | Comma-separated ignore patterns |
-| `--join` | boolean | `false` | Combine output into a single file |
-| `--format <md\|json>` | string | `md` | Output format |
-| `--watch` | boolean | `false` | Watch for changes and rebuild |
-| `--silent` | boolean | `false` | Suppress non-error output |
+| Flag                   | Type    | Default | Description                               |
+| ---------------------- | ------- | ------- | ----------------------------------------- |
+| `--out <DIR>`          | string  | `.`     | Output directory                          |
+| `--ignore <PATTERNS>`  | string  | -       | Comma-separated ignore patterns           |
+| `--join`               | boolean | `false` | Combine output into a single file         |
+| `--format <md\|json>`  | string  | `md`    | Output format                             |
+| `--watch`              | boolean | `false` | Watch for changes and rebuild             |
+| `--silent`             | boolean | `false` | Suppress non-error output                 |
 | `--preserve-structure` | boolean | `false` | Preserve input folder structure in output |
-| `--config <PATH>` | string | - | Path to config file |
-| `--version` | - | - | Show version number |
-| `--help` | - | - | Show help |
+| `--config <PATH>`      | string  | -       | Path to config file                       |
+| `--version`            | -       | -       | Show version number                       |
+| `--help`               | -       | -       | Show help                                 |
 
 ## Examples
 
@@ -76,10 +76,10 @@ compmark
 
 ## Exit Codes
 
-| Code | Meaning |
-| --- | --- |
-| `0` | Success (or watch mode running) |
-| `1` | One or more files failed to parse |
+| Code | Meaning                           |
+| ---- | --------------------------------- |
+| `0`  | Success (or watch mode running)   |
+| `1`  | One or more files failed to parse |
 
 ## Aliases
 

@@ -534,9 +534,7 @@ describe("generateMarkdown", () => {
     const doc: ComponentDoc = {
       name: "OldButton",
       deprecated: true,
-      props: [
-        { name: "x", type: "string", required: false, default: undefined, description: "" },
-      ],
+      props: [{ name: "x", type: "string", required: false, default: undefined, description: "" }],
       emits: [],
     };
 
@@ -549,9 +547,7 @@ describe("generateMarkdown", () => {
     const doc: ComponentDoc = {
       name: "OldButton",
       deprecated: "Use NewButton instead",
-      props: [
-        { name: "x", type: "string", required: false, default: undefined, description: "" },
-      ],
+      props: [{ name: "x", type: "string", required: false, default: undefined, description: "" }],
       emits: [],
     };
 
@@ -564,9 +560,7 @@ describe("generateMarkdown", () => {
     const doc: ComponentDoc = {
       name: "Button",
       version: "2.1.0",
-      props: [
-        { name: "x", type: "string", required: false, default: undefined, description: "" },
-      ],
+      props: [{ name: "x", type: "string", required: false, default: undefined, description: "" }],
       emits: [],
     };
 
@@ -577,9 +571,7 @@ describe("generateMarkdown", () => {
   it("renders only specified sections via sectionOrder", () => {
     const doc: ComponentDoc = {
       name: "Test",
-      props: [
-        { name: "x", type: "string", required: false, default: undefined, description: "" },
-      ],
+      props: [{ name: "x", type: "string", required: false, default: undefined, description: "" }],
       emits: [{ name: "click", description: "" }],
       refs: [{ name: "count", type: "Ref<number>", description: "" }],
     };
@@ -593,9 +585,7 @@ describe("generateMarkdown", () => {
   it("respects custom section ordering", () => {
     const doc: ComponentDoc = {
       name: "Test",
-      props: [
-        { name: "x", type: "string", required: false, default: undefined, description: "" },
-      ],
+      props: [{ name: "x", type: "string", required: false, default: undefined, description: "" }],
       emits: [{ name: "click", description: "" }],
     };
 
@@ -608,9 +598,7 @@ describe("generateMarkdown", () => {
   it("default section order has Refs before Props", () => {
     const doc: ComponentDoc = {
       name: "Test",
-      props: [
-        { name: "x", type: "string", required: false, default: undefined, description: "" },
-      ],
+      props: [{ name: "x", type: "string", required: false, default: undefined, description: "" }],
       emits: [],
       refs: [{ name: "count", type: "Ref<number>", description: "" }],
     };
@@ -627,9 +615,7 @@ describe("generateMarkdown", () => {
       deprecated: "Removed in v3",
       version: "1.5.0",
       description: "A legacy component.",
-      props: [
-        { name: "x", type: "string", required: false, default: undefined, description: "" },
-      ],
+      props: [{ name: "x", type: "string", required: false, default: undefined, description: "" }],
       emits: [],
     };
 
@@ -654,7 +640,9 @@ describe("generateMarkdown", () => {
   it("warns on all-invalid sectionOrder keys and shows 'No documentable API found'", () => {
     const doc: ComponentDoc = {
       name: "Button",
-      props: [{ name: "label", type: "string", required: true, default: undefined, description: "Label" }],
+      props: [
+        { name: "label", type: "string", required: true, default: undefined, description: "Label" },
+      ],
       emits: [],
     };
 
@@ -669,7 +657,9 @@ describe("generateMarkdown", () => {
   it("warns on unknown sectionOrder keys and skips them", () => {
     const doc: ComponentDoc = {
       name: "Button",
-      props: [{ name: "label", type: "string", required: true, default: undefined, description: "Label" }],
+      props: [
+        { name: "label", type: "string", required: true, default: undefined, description: "Label" },
+      ],
       emits: [],
     };
 
@@ -684,7 +674,13 @@ describe("generateMarkdown", () => {
       name: "TextInput",
       category: "Forms",
       props: [
-        { name: "value", type: "string", required: true, default: undefined, description: "The input value" },
+        {
+          name: "value",
+          type: "string",
+          required: true,
+          default: undefined,
+          description: "The input value",
+        },
       ],
       emits: [],
     };

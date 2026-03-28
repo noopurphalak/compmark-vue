@@ -59,7 +59,8 @@ export function mergeWithCLIFlags(
   const merged = defu(overrides, config) as CompmarkConfig;
   // defu concatenates arrays; replace array fields explicitly when CLI provided them
   if (overrides.exclude !== undefined) merged.exclude = overrides.exclude as string[];
-  if (overrides.sectionOrder !== undefined) merged.sectionOrder = overrides.sectionOrder as string[];
+  if (overrides.sectionOrder !== undefined)
+    merged.sectionOrder = overrides.sectionOrder as string[];
   return merged;
 }
 

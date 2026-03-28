@@ -581,7 +581,7 @@ Output:
  * @version 2.1.0
  * @deprecated Use TextFieldV2 instead
  */
-import { ref } from 'vue'
+import { ref } from "vue";
 </script>
 ```
 
@@ -746,13 +746,13 @@ Create `compmark.config.ts` in your project root:
 
 ```ts
 export default {
-  include: ['src/components/**/*.vue'],
-  exclude: ['**/*.test.vue'],
-  outDir: 'docs/api',
-  format: 'md',
-  aliases: { '@': './src' },
-  sectionOrder: ['props', 'emits', 'slots', 'refs', 'computed', 'exposed', 'composables'],
-}
+  include: ["src/components/**/*.vue"],
+  exclude: ["**/*.test.vue"],
+  outDir: "docs/api",
+  format: "md",
+  aliases: { "@": "./src" },
+  sectionOrder: ["props", "emits", "slots", "refs", "computed", "exposed", "composables"],
+};
 ```
 
 Then run `compmark` with no arguments — the config provides everything.
@@ -766,8 +766,8 @@ Use `@category` to group components in `--join` output:
 ```vue
 <script setup lang="ts">
 /** @category Forms */
-import { ref } from 'vue'
-defineProps<{ label: string }>()
+import { ref } from "vue";
+defineProps<{ label: string }>();
 </script>
 ```
 
@@ -780,8 +780,8 @@ The `sectionOrder` config option controls which sections appear and in what orde
 ```ts
 export default {
   // Only show props and emits, hide everything else
-  sectionOrder: ['props', 'emits'],
-}
+  sectionOrder: ["props", "emits"],
+};
 ```
 
 Available keys: `refs`, `computed`, `props`, `emits`, `slots`, `exposed`, `composables`.
@@ -793,10 +793,10 @@ compmark automatically reads `tsconfig.json` (or `jsconfig.json`) `compilerOptio
 ```ts
 export default {
   aliases: {
-    '@': './src',           // overrides tsconfig @/* path
-    '#utils': './lib/utils' // additional alias
+    "@": "./src", // overrides tsconfig @/* path
+    "#utils": "./lib/utils", // additional alias
   },
-}
+};
 ```
 
 Config aliases take precedence over tsconfig paths on conflict.

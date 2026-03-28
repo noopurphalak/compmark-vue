@@ -12,17 +12,17 @@ defineProps({
   label: String,
   count: { type: Number, required: true, default: 0 },
   items: { type: [Array, Object] },
-})
+});
 </script>
 ```
 
 **Generated output:**
 
-| Name | Type | Required | Default | Description |
-| --- | --- | --- | --- | --- |
-| label | String | No | - | - |
-| count | Number | Yes | `0` | - |
-| items | Array \| Object | No | - | - |
+| Name  | Type            | Required | Default | Description |
+| ----- | --------------- | -------- | ------- | ----------- |
+| label | String          | No       | -       | -           |
+| count | Number          | Yes      | `0`     | -           |
+| items | Array \| Object | No       | -       | -           |
 
 ### TypeScript generic
 
@@ -30,21 +30,21 @@ defineProps({
 <script setup lang="ts">
 interface Props {
   /** The button label */
-  label: string
+  label: string;
   /** Visual variant */
-  variant?: 'primary' | 'secondary'
+  variant?: "primary" | "secondary";
 }
 
-defineProps<Props>()
+defineProps<Props>();
 </script>
 ```
 
 **Generated output:**
 
-| Name | Type | Required | Default | Description |
-| --- | --- | --- | --- | --- |
-| label | string | Yes | - | The button label |
-| variant | 'primary' \| 'secondary' | No | - | Visual variant |
+| Name    | Type                     | Required | Default | Description      |
+| ------- | ------------------------ | -------- | ------- | ---------------- |
+| label   | string                   | Yes      | -       | The button label |
+| variant | 'primary' \| 'secondary' | No       | -       | Visual variant   |
 
 ### withDefaults
 
@@ -52,22 +52,22 @@ defineProps<Props>()
 <script setup lang="ts">
 interface Props {
   /** Button text */
-  label: string
-  disabled?: boolean
+  label: string;
+  disabled?: boolean;
 }
 
 withDefaults(defineProps<Props>(), {
   disabled: false,
-})
+});
 </script>
 ```
 
 **Generated output:**
 
-| Name | Type | Required | Default | Description |
-| --- | --- | --- | --- | --- |
-| label | string | Yes | - | Button text |
-| disabled | boolean | No | `false` | - |
+| Name     | Type    | Required | Default | Description |
+| -------- | ------- | -------- | ------- | ----------- |
+| label    | string  | Yes      | -       | Button text |
+| disabled | boolean | No       | `false` | -           |
 
 ## defineEmits
 
@@ -75,29 +75,29 @@ withDefaults(defineProps<Props>(), {
 
 ```vue
 <script setup>
-defineEmits(['click', 'update'])
+defineEmits(["click", "update"]);
 </script>
 ```
 
-| Name | Description |
-| --- | --- |
-| click | - |
-| update | - |
+| Name   | Description |
+| ------ | ----------- |
+| click  | -           |
+| update | -           |
 
 ### TypeScript generic with payloads
 
 ```vue
 <script setup lang="ts">
 defineEmits<{
-  click: [event: MouseEvent]
-  update: [value: string, index: number]
-}>()
+  click: [event: MouseEvent];
+  update: [value: string, index: number];
+}>();
 </script>
 ```
 
 When payloads are present, compmark adds a Payload column:
 
-| Name | Payload | Description |
-| --- | --- | --- |
-| click | [event: MouseEvent] | - |
-| update | [value: string, index: number] | - |
+| Name   | Payload                        | Description |
+| ------ | ------------------------------ | ----------- |
+| click  | [event: MouseEvent]            | -           |
+| update | [value: string, index: number] | -           |

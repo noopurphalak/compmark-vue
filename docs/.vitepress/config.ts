@@ -34,8 +34,6 @@ export default defineConfig({
         { text: "Config File", link: "/examples/config-file" },
       ],
     },
-    socialLinks: [
-      { icon: "github", link: "https://github.com/noopurphalak/compmark-vue" },
-    ],
+    socialLinks: [{ icon: "github", link: "https://github.com/noopurphalak/compmark-vue" }],
   },
 });

@@ -77,15 +77,11 @@ For a permanent setup, create `compmark.config.ts` at the monorepo root:
 
 ```ts
 export default {
-  include: ['packages/*/src/**/*.vue'],
-  exclude: [
-    'packages/internal/**',
-    '**/*.test.vue',
-    '**/__fixtures__/**',
-  ],
-  outDir: 'docs/api',
+  include: ["packages/*/src/**/*.vue"],
+  exclude: ["packages/internal/**", "**/*.test.vue", "**/__fixtures__/**"],
+  outDir: "docs/api",
   preserveStructure: true,
-}
+};
 ```
 
 Then run with no arguments:

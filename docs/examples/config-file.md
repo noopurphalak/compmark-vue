@@ -7,10 +7,10 @@
 ```ts
 // compmark.config.ts
 export default {
-  include: ['src/components/**/*.vue'],
-  exclude: ['**/*.test.vue'],
-  outDir: 'docs/api',
-}
+  include: ["src/components/**/*.vue"],
+  exclude: ["**/*.test.vue"],
+  outDir: "docs/api",
+};
 ```
 
 ```bash
@@ -24,13 +24,13 @@ compmark reads `tsconfig.json` paths automatically. Use `aliases` for additional
 ```ts
 // compmark.config.ts
 export default {
-  include: ['src/**/*.vue'],
-  outDir: 'docs/api',
+  include: ["src/**/*.vue"],
+  outDir: "docs/api",
   aliases: {
-    '@': './src',
-    '#shared': './packages/shared/src',
+    "@": "./src",
+    "#shared": "./packages/shared/src",
   },
-}
+};
 ```
 
 This allows cross-file type resolution for imports like `import type { Props } from '@/types'` and `import { useAuth } from '#shared/composables/useAuth'`.
@@ -42,10 +42,10 @@ Control which sections appear and in what order:
 ```ts
 // compmark.config.ts
 export default {
-  include: ['src/components/**/*.vue'],
-  outDir: 'docs/api',
-  sectionOrder: ['props', 'emits', 'slots', 'refs', 'computed', 'exposed', 'composables'],
-}
+  include: ["src/components/**/*.vue"],
+  outDir: "docs/api",
+  sectionOrder: ["props", "emits", "slots", "refs", "computed", "exposed", "composables"],
+};
 ```
 
 The default order is: `refs`, `computed`, `props`, `emits`, `slots`, `exposed`, `composables`.
@@ -55,8 +55,8 @@ Omit a key to hide that section entirely:
 ```ts
 export default {
   // Only document the public API — no internal refs/computed
-  sectionOrder: ['props', 'emits', 'slots', 'exposed'],
-}
+  sectionOrder: ["props", "emits", "slots", "exposed"],
+};
 ```
 
 ## Category grouping with joined output
@@ -70,7 +70,7 @@ Use `@category` in components and `--join` to produce organized documentation:
  * Primary action button.
  * @category Forms
  */
-defineProps<{ label: string }>()
+defineProps<{ label: string }>();
 </script>
 ```
 
@@ -81,17 +81,17 @@ defineProps<{ label: string }>()
  * Dialog overlay.
  * @category Overlays
  */
-defineProps<{ open: boolean }>()
+defineProps<{ open: boolean }>();
 </script>
 ```
 
 ```ts
 // compmark.config.ts
 export default {
-  include: ['src/components/**/*.vue'],
-  outDir: 'docs',
+  include: ["src/components/**/*.vue"],
+  outDir: "docs",
   join: true,
-}
+};
 ```
 
 The joined `docs/components.md` groups components by category with a table of contents.
@@ -101,10 +101,10 @@ The joined `docs/components.md` groups components by category with a table of co
 ```ts
 // compmark.config.ts
 export default {
-  include: ['src/components/**/*.vue'],
-  outDir: 'docs/api',
-  format: 'json',
-}
+  include: ["src/components/**/*.vue"],
+  outDir: "docs/api",
+  format: "json",
+};
 ```
 
 This produces individual `.json` files for each component. Combine with `join: true` to produce a single `components.json`.
@@ -114,11 +114,11 @@ This produces individual `.json` files for each component. Combine with `join: t
 ```ts
 // compmark.config.ts
 export default {
-  include: ['src/components/**/*.vue'],
-  outDir: 'docs/api',
+  include: ["src/components/**/*.vue"],
+  outDir: "docs/api",
   watch: true,
   silent: true,
-}
+};
 ```
 
 ::: tip

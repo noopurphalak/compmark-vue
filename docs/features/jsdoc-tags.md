@@ -4,17 +4,17 @@ compmark recognizes the following JSDoc tags inside `/** */` comment blocks.
 
 ## Tag reference
 
-| Tag | Scope | Effect |
-| --- | --- | --- |
-| `@deprecated [reason]` | Props, refs, computed, component | Adds **Deprecated** badge in description |
-| `@since <version>` | Props, refs, computed | Appends *(since version)* to description |
-| `@example <text>` | Props, refs, computed | Renders a code block after the table |
-| `@see <reference>` | Props, refs, computed | Appends `See: reference` to description |
-| `@default <value>` | Props | Overrides the displayed default value |
-| `@internal` | Component | Excludes component from documentation entirely |
-| `@component` | Component | Marks JSDoc as component-level (use when first statement is a variable) |
-| `@category <name>` | Component | Groups components under a heading in joined output |
-| `@version <version>` | Component | Displays version badge below heading |
+| Tag                    | Scope                            | Effect                                                                  |
+| ---------------------- | -------------------------------- | ----------------------------------------------------------------------- |
+| `@deprecated [reason]` | Props, refs, computed, component | Adds **Deprecated** badge in description                                |
+| `@since <version>`     | Props, refs, computed            | Appends _(since version)_ to description                                |
+| `@example <text>`      | Props, refs, computed            | Renders a code block after the table                                    |
+| `@see <reference>`     | Props, refs, computed            | Appends `See: reference` to description                                 |
+| `@default <value>`     | Props                            | Overrides the displayed default value                                   |
+| `@internal`            | Component                        | Excludes component from documentation entirely                          |
+| `@component`           | Component                        | Marks JSDoc as component-level (use when first statement is a variable) |
+| `@category <name>`     | Component                        | Groups components under a heading in joined output                      |
+| `@version <version>`   | Component                        | Displays version badge below heading                                    |
 
 ## @deprecated
 
@@ -22,9 +22,9 @@ compmark recognizes the following JSDoc tags inside `/** */` comment blocks.
 <script setup lang="ts">
 defineProps<{
   /** @deprecated Use `icon` prop instead */
-  iconName?: string
-  icon?: string
-}>()
+  iconName?: string;
+  icon?: string;
+}>();
 </script>
 ```
 
@@ -52,8 +52,8 @@ defineProps<{
    * @since 1.3.0
    * @see https://docs.example.com/animations
    */
-  duration?: number
-}>()
+  duration?: number;
+}>();
 </script>
 ```
 
@@ -72,8 +72,8 @@ defineProps<{
    * CSS color value
    * @example #ff0000
    */
-  color?: string
-}>()
+  color?: string;
+}>();
 </script>
 ```
 
@@ -94,7 +94,7 @@ After the Props table, compmark adds:
 /**
  * @internal
  */
-import { ref } from 'vue'
+import { ref } from "vue";
 </script>
 ```
 
@@ -111,7 +111,7 @@ Use `@component` when the first statement in `<script setup>` is a variable decl
  * @component
  * @category Overlays
  */
-const isOpen = ref(false)
+const isOpen = ref(false);
 </script>
 ```
 
@@ -126,7 +126,7 @@ Used with `--join` to group components under category headings:
 /**
  * @category Forms
  */
-defineProps<{ value: string }>()
+defineProps<{ value: string }>();
 </script>
 ```
 
@@ -140,7 +140,7 @@ In joined output, components are grouped by category with a heading and TOC entr
  * Accessible date picker.
  * @version 2.0.0
  */
-defineProps<{ modelValue: Date }>()
+defineProps<{ modelValue: Date }>();
 </script>
 ```
 

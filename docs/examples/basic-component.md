@@ -12,35 +12,38 @@ A complete walkthrough: write a component, run compmark, see the output.
  * @category Display
  * @version 1.0.0
  */
-import { computed } from 'vue'
+import { computed } from "vue";
 
 interface Props {
   /** User's full name */
-  name: string
+  name: string;
   /** Avatar image URL */
-  avatar?: string
+  avatar?: string;
   /** User role badge */
-  role?: 'admin' | 'editor' | 'viewer'
+  role?: "admin" | "editor" | "viewer";
 }
 
-const props = defineProps<Props>()
+const props = defineProps<Props>();
 
 defineEmits<{
   /** Fired when the card is clicked */
-  click: [user: string]
+  click: [user: string];
   /** Fired when the edit button is pressed */
-  edit: []
-}>()
+  edit: [];
+}>();
 
 defineSlots<{
   /** Custom action buttons */
-  actions(props: {}): any
-}>()
+  actions(props: {}): any;
+}>();
 
 /** User initials for fallback avatar */
 const initials = computed(() =>
-  props.name.split(' ').map(n => n[0]).join('')
-)
+  props.name
+    .split(" ")
+    .map((n) => n[0])
+    .join(""),
+);
 </script>
 
 <template>
@@ -74,30 +77,30 @@ Displays a user profile card with avatar and actions.
 
 ## Computed
 
-| Name | Type | Description |
-| --- | --- | --- |
+| Name     | Type   | Description                       |
+| -------- | ------ | --------------------------------- |
 | initials | string | User initials for fallback avatar |
 
 ## Props
 
-| Name | Type | Required | Default | Description |
-| --- | --- | --- | --- | --- |
-| name | string | Yes | - | User's full name |
-| avatar | string | No | - | Avatar image URL |
-| role | 'admin' \| 'editor' \| 'viewer' | No | - | User role badge |
+| Name   | Type                            | Required | Default | Description      |
+| ------ | ------------------------------- | -------- | ------- | ---------------- |
+| name   | string                          | Yes      | -       | User's full name |
+| avatar | string                          | No       | -       | Avatar image URL |
+| role   | 'admin' \| 'editor' \| 'viewer' | No       | -       | User role badge  |
 
 ## Emits
 
-| Name | Payload | Description |
-| --- | --- | --- |
-| click | [user: string] | Fired when the card is clicked |
-| edit | [] | Fired when the edit button is pressed |
+| Name  | Payload        | Description                           |
+| ----- | -------------- | ------------------------------------- |
+| click | [user: string] | Fired when the card is clicked        |
+| edit  | []             | Fired when the edit button is pressed |
 
 ## Slots
 
-| Name | Bindings | Description |
-| --- | --- | --- |
-| actions | - | Custom action buttons |
+| Name    | Bindings | Description           |
+| ------- | -------- | --------------------- |
+| actions | -        | Custom action buttons |
 ```
 
 ## 4. Add to your workflow

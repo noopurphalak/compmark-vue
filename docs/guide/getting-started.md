@@ -36,17 +36,17 @@ Given a component `Button.vue`:
 
 interface Props {
   /** The button label */
-  label: string
+  label: string;
   /** Visual variant */
-  variant?: 'primary' | 'secondary'
+  variant?: "primary" | "secondary";
   /** Whether the button is disabled */
-  disabled?: boolean
+  disabled?: boolean;
 }
 
-defineProps<Props>()
+defineProps<Props>();
 defineEmits<{
-  click: [event: MouseEvent]
-}>()
+  click: [event: MouseEvent];
+}>();
 </script>
 
 <template>
@@ -67,23 +67,23 @@ A primary action button.
 
 ## Props
 
-| Name | Type | Required | Default | Description |
-| --- | --- | --- | --- | --- |
-| label | string | Yes | - | The button label |
-| variant | 'primary' \| 'secondary' | No | - | Visual variant |
-| disabled | boolean | No | - | Whether the button is disabled |
+| Name     | Type                     | Required | Default | Description                    |
+| -------- | ------------------------ | -------- | ------- | ------------------------------ |
+| label    | string                   | Yes      | -       | The button label               |
+| variant  | 'primary' \| 'secondary' | No       | -       | Visual variant                 |
+| disabled | boolean                  | No       | -       | Whether the button is disabled |
 
 ## Emits
 
-| Name | Payload | Description |
-| --- | --- | --- |
-| click | [event: MouseEvent] | - |
+| Name  | Payload             | Description |
+| ----- | ------------------- | ----------- |
+| click | [event: MouseEvent] | -           |
 
 ## Slots
 
-| Name | Bindings | Description |
-| --- | --- | --- |
-| default | - | - |
+| Name    | Bindings | Description |
+| ------- | -------- | ----------- |
+| default | -        | -           |
 ```
 
 ## Add Config File (Optional)
@@ -92,11 +92,11 @@ Create `compmark.config.ts` in your project root:
 
 ```ts
 export default {
-  include: ['src/components/**/*.vue'],
-  exclude: ['**/*.test.vue'],
-  outDir: 'docs/api',
-  format: 'md',
-}
+  include: ["src/components/**/*.vue"],
+  exclude: ["**/*.test.vue"],
+  outDir: "docs/api",
+  format: "md",
+};
 ```
 
 Now you can run `npx compmark` with no arguments.

@@ -52,18 +52,18 @@ compmark supports all common Vue 3 SFC patterns.
 
 ## JSDoc Tags
 
-| Tag | Scope | Description |
-| --- | --- | --- |
+| Tag                    | Scope                            | Description                              |
+| ---------------------- | -------------------------------- | ---------------------------------------- |
 | `@deprecated [reason]` | Props, refs, computed, component | Marks as deprecated with optional reason |
-| `@since <version>` | Props, refs, computed | Version when added |
-| `@example <text>` | Props, refs, computed | Usage example |
-| `@see <reference>` | Props, refs, computed | Cross-reference |
-| `@default <value>` | Props | Override default value display |
-| `@internal` | Component | Exclude from documentation |
-| `@component` | Component | Explicit component-level JSDoc marker |
-| `@category <name>` | Component | Group in joined output |
-| `@version <version>` | Component | Component version badge |
-| `@emit <name> <desc>` | Emits (array syntax) | Describe individual emit events |
+| `@since <version>`     | Props, refs, computed            | Version when added                       |
+| `@example <text>`      | Props, refs, computed            | Usage example                            |
+| `@see <reference>`     | Props, refs, computed            | Cross-reference                          |
+| `@default <value>`     | Props                            | Override default value display           |
+| `@internal`            | Component                        | Exclude from documentation               |
+| `@component`           | Component                        | Explicit component-level JSDoc marker    |
+| `@category <name>`     | Component                        | Group in joined output                   |
+| `@version <version>`   | Component                        | Component version badge                  |
+| `@emit <name> <desc>`  | Emits (array syntax)             | Describe individual emit events          |
 
 ## Template Slots
 

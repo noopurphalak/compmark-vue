@@ -237,10 +237,7 @@ describe("loadCompmarkConfig", () => {
 
   it("falls back to DEFAULT_SECTION_ORDER when sectionOrder is not in config", async () => {
     const tmpDir = makeTmpDir();
-    writeFileSync(
-      join(tmpDir, "compmark.config.json"),
-      JSON.stringify({ outDir: "./docs" }),
-    );
+    writeFileSync(join(tmpDir, "compmark.config.json"), JSON.stringify({ outDir: "./docs" }));
 
     const result = await loadCompmarkConfig(join(tmpDir, "compmark.config.json"));
 

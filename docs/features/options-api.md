@@ -18,8 +18,8 @@ export default {
       default: 0,
     },
   },
-  emits: ['update', 'close'],
-}
+  emits: ["update", "close"],
+};
 </script>
 ```
 
@@ -27,25 +27,25 @@ export default {
 
 ### Props
 
-| Name | Type | Required | Default | Description |
-| --- | --- | --- | --- | --- |
-| title | String | Yes | - | The display title |
-| count | Number | No | `0` | - |
+| Name  | Type   | Required | Default | Description       |
+| ----- | ------ | -------- | ------- | ----------------- |
+| title | String | Yes      | -       | The display title |
+| count | Number | No       | `0`     | -                 |
 
 ### Emits
 
-| Name | Description |
-| --- | --- |
-| update | - |
-| close | - |
+| Name   | Description |
+| ------ | ----------- |
+| update | -           |
+| close  | -           |
 
 ## Array props
 
 ```vue
 <script>
 export default {
-  props: ['title', 'count', 'visible'],
-}
+  props: ["title", "count", "visible"],
+};
 </script>
 ```
 
@@ -58,9 +58,9 @@ Each prop is extracted with type `any` and `required: false`.
 export default {
   emits: {
     click: null,
-    submit: (payload) => typeof payload === 'string',
+    submit: (payload) => typeof payload === "string",
   },
-}
+};
 </script>
 ```
 
@@ -74,20 +74,24 @@ export default {
       /** Current counter value */
       count: 0,
       /** User display name */
-      name: 'Anonymous',
-    }
+      name: "Anonymous",
+    };
   },
   computed: {
     /** Whether count is positive */
     isPositive() {
-      return this.count > 0
+      return this.count > 0;
     },
     fullName: {
-      get() { return this.name },
-      set(val) { this.name = val },
+      get() {
+        return this.name;
+      },
+      set(val) {
+        this.name = val;
+      },
     },
   },
-}
+};
 </script>
 ```
 
@@ -95,17 +99,17 @@ export default {
 
 ### Refs
 
-| Name | Type | Description |
-| --- | --- | --- |
+| Name  | Type   | Description           |
+| ----- | ------ | --------------------- |
 | count | number | Current counter value |
-| name | string | User display name |
+| name  | string | User display name     |
 
 ### Computed
 
-| Name | Type | Description |
-| --- | --- | --- |
+| Name       | Type    | Description               |
+| ---------- | ------- | ------------------------- |
 | isPositive | unknown | Whether count is positive |
-| fullName | unknown | - |
+| fullName   | unknown | -                         |
 
 ::: tip
 Options API `data()` properties appear under **Refs** and `computed` properties appear under **Computed**, matching the Composition API sections.

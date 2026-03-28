@@ -6,16 +6,16 @@ compmark extracts reactive state declarations from `<script setup>` and Options 
 
 ```vue
 <script setup lang="ts">
-import { ref, shallowRef } from 'vue'
+import { ref, shallowRef } from "vue";
 
 /** Current search query */
-const query = ref('')
+const query = ref("");
 
 /** Selected user ID */
-const userId = ref<number | null>(null)
+const userId = ref<number | null>(null);
 
 /** The active data set (shallow for performance) */
-const dataset = shallowRef<Record<string, unknown>[]>([])
+const dataset = shallowRef<Record<string, unknown>[]>([]);
 </script>
 ```
 
@@ -23,25 +23,25 @@ const dataset = shallowRef<Record<string, unknown>[]>([])
 
 ## Refs
 
-| Name | Type | Description |
-| --- | --- | --- |
-| query | string | Current search query |
-| userId | number \| null | Selected user ID |
+| Name    | Type                            | Description                                   |
+| ------- | ------------------------------- | --------------------------------------------- |
+| query   | string                          | Current search query                          |
+| userId  | number \| null                  | Selected user ID                              |
 | dataset | Record&lt;string, unknown&gt;[] | The active data set (shallow for performance) |
 
 ## computed()
 
 ```vue
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed } from "vue";
 
-const items = ref<string[]>([])
+const items = ref<string[]>([]);
 
 /** Total number of items */
-const count = computed(() => items.value.length)
+const count = computed(() => items.value.length);
 
 /** Whether the list is empty */
-const isEmpty = computed<boolean>(() => items.value.length === 0)
+const isEmpty = computed<boolean>(() => items.value.length === 0);
 </script>
 ```
 
@@ -49,9 +49,9 @@ const isEmpty = computed<boolean>(() => items.value.length === 0)
 
 ## Computed
 
-| Name | Type | Description |
-| --- | --- | --- |
-| count | number | Total number of items |
+| Name    | Type    | Description               |
+| ------- | ------- | ------------------------- |
+| count   | number  | Total number of items     |
 | isEmpty | boolean | Whether the list is empty |
 
 ## Type inference
@@ -73,10 +73,10 @@ Refs and computed properties support the same JSDoc tags as props:
  * @since 2.1.0
  * @deprecated Use usePagination() instead
  */
-const page = ref(1)
+const page = ref(1);
 </script>
 ```
 
-| Name | Type | Description |
-| --- | --- | --- |
-| page | number | Tracks the current page number *(since 2.1.0)* **Deprecated**: Use usePagination() instead |
+| Name | Type   | Description                                                                                |
+| ---- | ------ | ------------------------------------------------------------------------------------------ |
+| page | number | Tracks the current page number _(since 2.1.0)_ **Deprecated**: Use usePagination() instead |

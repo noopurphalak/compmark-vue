@@ -9,16 +9,16 @@ Create `compmark.config.ts` (or `.js`, `.mjs`, `.json`) in your project root:
 ```ts
 export default {
   // Glob patterns for input files
-  include: ['src/components/**/*.vue'],
+  include: ["src/components/**/*.vue"],
 
   // Glob patterns to ignore
-  exclude: ['**/*.test.vue', '**/internal/**'],
+  exclude: ["**/*.test.vue", "**/internal/**"],
 
   // Output directory
-  outDir: 'docs/api',
+  outDir: "docs/api",
 
   // Output format: "md" or "json"
-  format: 'md',
+  format: "md",
 
   // Combine all components into a single file
   join: false,
@@ -28,19 +28,19 @@ export default {
 
   // Path aliases (merged with tsconfig.json paths)
   aliases: {
-    '@': './src',
-    '~': './lib',
+    "@": "./src",
+    "~": "./lib",
   },
 
   // Control section ordering in markdown output
-  sectionOrder: ['props', 'emits', 'slots', 'refs', 'computed', 'exposed', 'composables'],
+  sectionOrder: ["props", "emits", "slots", "refs", "computed", "exposed", "composables"],
 
   // Suppress non-error output
   silent: false,
 
   // Watch mode
   watch: false,
-}
+};
 ```
 
 ## Config Discovery
@@ -55,18 +55,18 @@ If no config file is found, all defaults apply and CLI args are used.
 
 ## Options Reference
 
-| Option | Type | Default | Description |
-| --- | --- | --- | --- |
-| `include` | `string[]` | - | Glob patterns for input files |
-| `exclude` | `string[]` | - | Glob patterns to ignore |
-| `outDir` | `string` | `"."` | Output directory |
-| `format` | `"md" \| "json"` | `"md"` | Output format |
-| `join` | `boolean` | `false` | Combine into single file |
-| `preserveStructure` | `boolean` | `false` | Mirror input folder tree |
-| `aliases` | `Record<string, string>` | - | Path aliases for imports |
-| `sectionOrder` | `SectionKey[]` | All sections | Section ordering |
-| `silent` | `boolean` | `false` | Suppress output |
-| `watch` | `boolean` | `false` | Watch mode |
+| Option              | Type                     | Default      | Description                   |
+| ------------------- | ------------------------ | ------------ | ----------------------------- |
+| `include`           | `string[]`               | -            | Glob patterns for input files |
+| `exclude`           | `string[]`               | -            | Glob patterns to ignore       |
+| `outDir`            | `string`                 | `"."`        | Output directory              |
+| `format`            | `"md" \| "json"`         | `"md"`       | Output format                 |
+| `join`              | `boolean`                | `false`      | Combine into single file      |
+| `preserveStructure` | `boolean`                | `false`      | Mirror input folder tree      |
+| `aliases`           | `Record<string, string>` | -            | Path aliases for imports      |
+| `sectionOrder`      | `SectionKey[]`           | All sections | Section ordering              |
+| `silent`            | `boolean`                | `false`      | Suppress output               |
+| `watch`             | `boolean`                | `false`      | Watch mode                    |
 
 ## Section Order
 
@@ -75,8 +75,8 @@ The `sectionOrder` option controls which sections appear and in what order:
 ```ts
 export default {
   // Only show props and emits, in this order
-  sectionOrder: ['props', 'emits'],
-}
+  sectionOrder: ["props", "emits"],
+};
 ```
 
 Available section keys: `refs`, `computed`, `props`, `emits`, `slots`, `exposed`, `composables`.
@@ -90,10 +90,10 @@ compmark automatically reads `tsconfig.json` (or `jsconfig.json`) `compilerOptio
 ```ts
 export default {
   aliases: {
-    '@': './src',           // overrides tsconfig @/* path
-    '#utils': './lib/utils' // additional alias
+    "@": "./src", // overrides tsconfig @/* path
+    "#utils": "./lib/utils", // additional alias
   },
-}
+};
 ```
 
 Config aliases take precedence over tsconfig paths on conflict.
