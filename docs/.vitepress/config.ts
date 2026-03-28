@@ -6,7 +6,9 @@ export default defineConfig({
   base: "/compmark-vue/",
   cleanUrls: true,
   lastUpdated: true,
+  head: [["link", { rel: "icon", href: "/compmark-vue/logo.svg", type: "image/svg+xml" }]],
   themeConfig: {
+    logo: "/logo.svg",
     nav: [
       { text: "Guide", link: "/guide/getting-started" },
       { text: "Features", link: "/features/props-emits" },

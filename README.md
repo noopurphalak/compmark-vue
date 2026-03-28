@@ -1,9 +1,12 @@
-# compmark-vue
+<p align="center">
+  <img src="./logo.svg" width="120" height="120" alt="compmark logo">
+</p>
+
+<h1 align="center">Compmark Vue</h1>
 
 <!-- automd:badges color=yellow -->
 
-[![npm version](https://img.shields.io/npm/v/compmark-vue?color=yellow)](https://npmjs.com/package/compmark-vue)
-[![npm downloads](https://img.shields.io/npm/dm/compmark-vue?color=yellow)](https://npm.chart.dev/compmark-vue)
+[![npm version](https://img.shields.io/npm/v/compmark-vue?color=yellow)](https://npmjs.com/package/compmark-vue) [![npm downloads](https://img.shields.io/npm/dm/compmark-vue?color=yellow)](https://npm.chart.dev/compmark-vue)
 
 <!-- /automd -->
 
@@ -751,7 +754,15 @@ export default {
   outDir: "docs/api",
   format: "md",
   aliases: { "@": "./src" },
-  sectionOrder: ["props", "emits", "slots", "refs", "computed", "exposed", "composables"],
+  sectionOrder: [
+    "props",
+    "emits",
+    "slots",
+    "refs",
+    "computed",
+    "exposed",
+    "composables",
+  ],
 };
 ```
 
@@ -828,7 +839,10 @@ Multi-file processing:
 ```ts
 import { discoverFiles, processFiles } from "compmark-vue";
 
-const { files, ignoredCount, basePath } = await discoverFiles(["src/components"], ["dist"]);
+const { files, ignoredCount, basePath } = await discoverFiles(
+  ["src/components"],
+  ["dist"],
+);
 const summary = processFiles(files, { silent: false });
 // summary.files, summary.documented, summary.skipped, summary.errors
 ```

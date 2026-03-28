@@ -3,6 +3,9 @@ layout: home
 hero:
   name: compmark
   text: Vue Component Documentation Generator
+  image:
+    src: /logo.svg
+    alt: compmark logo
   tagline: Documentation that writes itself
   actions:
     - theme: brand
